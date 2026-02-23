@@ -99,7 +99,7 @@ export default function ProcessPage({
         ref={svgSectionRef}
         className="relative lg:h-[500vh] lg:min-h-[3200px] min-h-[350vh] h-full overflow-hidden z-0 lg:-mt-[40vh]"
       >
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 -z-10 pointer-events-none" style={{ isolation: "isolate" }}>
           <svg
             className="absolute inset-0 w-full h-full hidden lg:block"
             viewBox="-50 100 900 2700"
