@@ -84,5 +84,5 @@ export const FALLBACK_STEPS: ProcessSection[] = [
   },
 ];
 
-export const IMG_TOPS = ["18%", "36%", "54%", "70%", "85%"];
-export const CARD_TOPS = ["16%", "34%", "52%", "72%", "82%"];
+export const IMG_TOPS = ["14%", "32%", "50%", "68%", "86%"];
+export const CARD_TOPS = ["12%", "30%", "48%", "68%", "84%"];

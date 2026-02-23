@@ -97,7 +97,7 @@ export default function ProcessPage({
 
       <section
         ref={svgSectionRef}
-        className="relative lg:h-[500vh] min-h-[350vh] h-full overflow-hidden z-0 lg:-mt-[40vh]"
+        className="relative lg:h-[500vh] lg:min-h-[3200px] min-h-[350vh] h-full overflow-hidden z-0 lg:-mt-[40vh]"
       >
         <div className="absolute inset-0 z-0 pointer-events-none">
           <svg
@@ -205,7 +205,7 @@ export default function ProcessPage({
               return (
                 <div key={section.id}>
                   <div
-                    className={`absolute z-[15] aspect-square w-[min(580px,42vw)] ${imgPositionClasses}`}
+                    className={`absolute z-[15] aspect-square w-[min(480px,38vw)] ${imgPositionClasses}`}
                     style={{ top: imgTop }}
                   >
                     <div
@@ -243,7 +243,7 @@ export default function ProcessPage({
                     ref={(el) => {
                       cardRefs.current[index] = el;
                     }}
-                    className={`absolute z-20 w-[min(580px,52vw)] ${cardPositionClasses}`}
+                    className={`absolute z-20 w-[min(520px,48vw)] ${cardPositionClasses}`}
                     style={{ top: cardTop }}
                   >
                     <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 sm:p-10 border border-white/10 shadow-xl">
