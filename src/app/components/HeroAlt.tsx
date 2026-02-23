@@ -143,7 +143,7 @@ export default function NeonSideFlyInSafari({ lang = "pl" }: HeroAltProps) {
   }, []);
 
   const baseTextStyle =
-    "absolute left-0 top-0 w-full  h-full flex justify-between -mt-12 md:mt-0 px-4 md:px-0 items-center font-light text-6xl sm:text-8xl md:text-9xl lg:text-[8rem] xl:text-[9rem] pointer-events-none select-none antialiased";
+    "absolute left-0 top-0 w-full  h-full flex justify-between -mt-12 md:mt-0 px-4 md:px-0 items-center font-light text-5xl sm:text-8xl md:text-9xl lg:text-[8rem] xl:text-[9rem] pointer-events-none select-none antialiased";
   const heroFontStyle = { fontFamily: "var(--font-orbitron), sans-serif" };
   const letterStyle = "inline-block mx-1 invisible opacity-0";
   const neonTextShadow = `
@@ -189,7 +189,7 @@ export default function NeonSideFlyInSafari({ lang = "pl" }: HeroAltProps) {
         </g>
       </svg>
 
-      <div className="w-full flex items-center justify-center">
+      <div className="w-full  mt-12 flex items-center justify-center">
         <h1 className="relative z-10 w-full max-w-7xl h-[200px] m-0 flex items-center justify-center">
           <div
             className={`${baseTextStyle} text-[#E8F4FC] neon-glow-layer`}
@@ -223,7 +223,7 @@ export default function NeonSideFlyInSafari({ lang = "pl" }: HeroAltProps) {
       </div>
       <div
         ref={subtitleRef}
-        className="relative z-10 mt-10 flex flex-col items-center gap-6 invisible opacity-0">
+        className="relative z-10 mt-24 flex flex-col items-center gap-6 invisible opacity-0">
         <p
           className="text-sm sm:text-base tracking-[0.25em] uppercase text-white/70 font-light text-center"
           style={{

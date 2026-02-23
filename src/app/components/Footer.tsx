@@ -41,10 +41,15 @@ export default function Footer() {
     useState<Awaited<ReturnType<typeof fetchFooterData>>>(null);
   const [servicesData, setServicesData] =
     useState<Awaited<ReturnType<typeof fetchServicesSection>>>(null);
+  const [faqItems, setFaqItems] = useState<{ id: number; question: string }[]>([]);
 
   useEffect(() => {
     fetchFooterData(lang).then((data) => setFooterData(data));
     fetchServicesSection(lang).then((data) => setServicesData(data));
+    fetch(`/api/faq?lang=${lang}`)
+      .then((res) => res.json())
+      .then((data: { items?: { id: number; question: string }[] }) => setFaqItems(data.items ?? []))
+      .catch(() => setFaqItems([]));
   }, [lang]);
 
   useEffect(() => {
@@ -192,7 +197,7 @@ export default function Footer() {
       />
 
       <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div
             ref={(el) => {
               sectionsRef.current[0] = el;
@@ -272,6 +277,27 @@ export default function Footer() {
                     href={link.href}
                     className="text-gray-400 hover:text-cyan-400 transition-colors text-sm">
                     {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div
+            ref={(el) => {
+              sectionsRef.current[3] = el;
+            }}
+            className="space-y-4">
+            <h3 className="text-white font-bold text-lg mb-4">
+              {t(lang, "footer.faqDefault")}
+            </h3>
+            <ul className="space-y-3">
+              {faqItems.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    href={getPath("/faq")}
+                    className="text-gray-400 hover:text-cyan-400 transition-colors text-sm line-clamp-2">
+                    {item.question}
                   </Link>
                 </li>
               ))}
