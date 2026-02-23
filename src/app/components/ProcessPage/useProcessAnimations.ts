@@ -173,7 +173,7 @@ export function useProcessAnimations(
     };
   }, [pathRef, pathMobileRef, svgSectionRef, heroLineRef, isMobile]);
 
-  // Karty i obrazy: animacja podczas scrollowania
+  // Karty i obrazy: animacja podczas scrollowania z efektem rozjasnienia (glow)
   useEffect(() => {
     if (!svgSectionRef.current) return;
 
@@ -181,52 +181,73 @@ export function useProcessAnimations(
       const cards = cardRefs.current.filter(Boolean);
       const images = imgRefs.current.filter(Boolean);
 
-      cards.forEach((card, index) => {
+      cards.forEach((card) => {
         if (!card) return;
         gsap.set(card, {
-          opacity: 0.5,
+          opacity: 0.15,
           y: 50,
           force3D: true,
         });
 
+        // Animacja wejscia - fade in + glow
         ScrollTrigger.create({
           trigger: card,
-          start: "top 80%",
-          end: "top 20%",
-          scrub: true,
-          onEnter: () => {
-            gsap.to(card, {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power2.out",
+          start: "top 85%",
+          end: "top 35%",
+          scrub: 0.5,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            gsap.set(card, {
+              opacity: 0.15 + progress * 0.85,
+              y: 50 * (1 - progress),
               force3D: true,
             });
+            // Neonowy glow na kartach - rozjasnienie jak w homepage
+            const glowIntensity = Math.sin(progress * Math.PI); // peak w srodku
+            const inner = card.querySelector("div");
+            if (inner) {
+              inner.style.boxShadow =
+                glowIntensity > 0.1
+                  ? `0 0 ${20 * glowIntensity}px rgba(0, 240, 255, ${0.15 * glowIntensity}), 0 0 ${60 * glowIntensity}px rgba(0, 240, 255, ${0.08 * glowIntensity})`
+                  : "";
+              inner.style.borderColor =
+                glowIntensity > 0.1
+                  ? `rgba(0, 240, 255, ${0.1 + 0.2 * glowIntensity})`
+                  : "";
+            }
           },
         });
       });
 
-      images.forEach((img, index) => {
+      images.forEach((img) => {
         if (!img) return;
         gsap.set(img, {
-          opacity: 0.5,
+          opacity: 0.15,
           scale: 0.95,
           force3D: true,
         });
 
         ScrollTrigger.create({
           trigger: img,
-          start: "top 80%",
-          end: "top 20%",
-          scrub: true,
-          onEnter: () => {
-            gsap.to(img, {
-              opacity: 1,
-              scale: 1,
-              duration: 0.8,
-              ease: "power2.out",
+          start: "top 85%",
+          end: "top 35%",
+          scrub: 0.5,
+          onUpdate: (self) => {
+            const progress = self.progress;
+            gsap.set(img, {
+              opacity: 0.15 + progress * 0.85,
+              scale: 0.95 + 0.05 * progress,
               force3D: true,
             });
+            // Neonowy glow na obrazach
+            const glowIntensity = Math.sin(progress * Math.PI);
+            if (glowIntensity > 0.1) {
+              img.style.boxShadow = `0 0 ${30 * glowIntensity}px rgba(0, 240, 255, ${0.2 * glowIntensity}), 0 0 ${80 * glowIntensity}px rgba(0, 240, 255, ${0.1 * glowIntensity})`;
+              img.style.borderColor = `rgba(0, 240, 255, ${0.3 + 0.4 * glowIntensity})`;
+            } else {
+              img.style.boxShadow = "";
+              img.style.borderColor = "";
+            }
           },
         });
       });
