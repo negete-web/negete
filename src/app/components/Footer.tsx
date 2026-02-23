@@ -295,7 +295,7 @@ export default function Footer() {
               {faqItems.map((item) => (
                 <li key={item.id}>
                   <Link
-                    href={getPath("/faq")}
+                    href={`${getPath("/faq")}#faq-${item.id}`}
                     className="text-gray-400 hover:text-cyan-400 transition-colors text-sm line-clamp-2">
                     {item.question}
                   </Link>
