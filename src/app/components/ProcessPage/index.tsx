@@ -99,7 +99,7 @@ export default function ProcessPage({
         ref={svgSectionRef}
         className="relative lg:h-[500vh] min-h-[350vh] h-full overflow-hidden z-0 lg:-mt-[40vh]"
       >
-        <div className="absolute inset-0 z-[1] pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <svg
             className="absolute inset-0 w-full h-full hidden lg:block"
             viewBox="-50 100 900 2700"
@@ -184,7 +184,7 @@ export default function ProcessPage({
         </div>
 
         {!isMobile && (
-          <div className="relative w-full mx-auto max-w-[1500px] z-10 h-full">
+          <div className="relative w-full mx-auto max-w-[1500px] z-[2] h-full">
             {sectionsToRender.map((section, index) => {
               const isLastAndCentered = hasFiveSections && index === 4;
               const isEven = index % 2 === 0;
@@ -297,7 +297,7 @@ export default function ProcessPage({
         )}
 
         {isMobile && (
-          <div className="relative w-full z-10 px-4 flex flex-col gap-2 pt-24 pb-12">
+          <div className="relative w-full z-[2] px-4 flex flex-col gap-2 pt-24 pb-12">
             {sectionsToRender.map((section, index) => {
               const IconCmp = ICONS[section.icon ?? ""] ?? ICONS.Search;
               return (
