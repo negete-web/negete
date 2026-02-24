@@ -8,6 +8,7 @@ import {
   type ProcessPageCta,
 } from "@/sanity/process";
 import type { Language } from "@/i18n/config";
+import { t } from "@/i18n/dictionary";
 import {
   ICONS,
   PATH_D,
@@ -40,6 +41,7 @@ export default function ProcessPage({
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const heroIntroRef = useRef<HTMLParagraphElement>(null);
   const heroLineRef = useRef<HTMLDivElement>(null);
+  const mobileLineFillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (initialData) return;
@@ -80,6 +82,7 @@ export default function ProcessPage({
       heroTitleRef,
       heroIntroRef,
       heroLineRef,
+      mobileLineFillRef,
     },
     processData,
     isMobile,
@@ -90,6 +93,7 @@ export default function ProcessPage({
       <ProcessHero
         heading={heading}
         intro={intro}
+        stepsHint={t(lang, "proces.stepsHint")}
         heroTitleRef={heroTitleRef}
         heroIntroRef={heroIntroRef}
         heroLineRef={heroLineRef}
@@ -97,10 +101,22 @@ export default function ProcessPage({
 
       <section
         ref={svgSectionRef}
-        className="relative lg:h-[500vh] lg:min-h-[3200px] min-h-[350vh] h-full overflow-hidden lg:-mt-[40vh] isolate">
+        className="relative lg:h-[500vh] lg:min-h-[3200px] min-h-[260vh] h-full overflow-hidden lg:-mt-[40vh] isolate">
+        {/* Na mobile: prosta linia w HTML na środku ekranu */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-white/10 z-[1] lg:hidden" aria-hidden />
+        <div
+          ref={mobileLineFillRef}
+          className="absolute left-1/2 top-0 w-0.5 -translate-x-1/2 origin-top z-[1] lg:hidden"
+          style={{
+            height: "0%",
+            background: "linear-gradient(to bottom, #00f0ff, #00f0ff80)",
+            boxShadow: "0 0 12px rgba(0,240,255,0.5)",
+          }}
+          aria-hidden
+        />
         <div className="absolute inset-0 z-0 pointer-events-none">
           <svg
-            className="absolute inset-0 w-full h-full hidden lg:block"
+            className="absolute inset-0 w-full px-12 h-full hidden lg:block"
             viewBox="-50 100 900 2700"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -226,12 +242,11 @@ export default function ProcessPage({
               ref={pathMobileRef}
               d={PATH_D_MOBILE}
               stroke="#00f0ff"
-              strokeWidth="2"
-              strokeLinecap="square"
+              strokeWidth="6"
+              strokeLinecap="round"
               strokeLinejoin="miter"
               fill="none"
               filter="url(#neonGlowMobile)"
-              mask="url(#fadeMaskMobile)"
             />
           </svg>
         </div>
@@ -354,7 +369,7 @@ export default function ProcessPage({
         )}
 
         {isMobile && (
-          <div className="relative w-full z-[2] px-4 flex flex-col gap-2 pt-24 pb-12">
+          <div className="relative w-full z-[2] px-4 flex flex-col gap-10 pt-24 pb-12">
             {sectionsToRender.map((section, index) => {
               const IconCmp = ICONS[section.icon ?? ""] ?? ICONS.Search;
               return (

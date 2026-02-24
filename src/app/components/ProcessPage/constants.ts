@@ -34,23 +34,8 @@ export const PATH_D =
   " L 400 2700" + // do środka
   " L 400 3350"; // prosto w dół do końca
 
-export const PATH_D_MOBILE =
-  "M 200 220" +
-  " L 200 400" + // prosto w dół
-  " L 60 400" + // w lewo
-  " L 60 750" + // w dół
-  " L 340 750" + // w prawo
-  " L 340 1100" + // w dół
-  " L 60 1100" + // w lewo
-  " L 60 1450" + // w dół
-  " L 340 1450" + // w prawo
-  " L 340 1800" + // w dół
-  " L 60 1800" + // w lewo
-  " L 60 2150" + // w dół
-  " L 340 2150" + // w prawo
-  " L 340 2500" + // w dół
-  " L 200 2500" + // do środka
-  " L 200 3600"; // prosto w dół
+/** Na mobile: prosta linia pionowa z lewej (widoczna obok kart) */
+export const PATH_D_MOBILE = "M 32 0 L 32 2000";
 
 export const FALLBACK_STEPS: ProcessSection[] = [
   {

@@ -15,6 +15,7 @@ interface ProcessAnimationRefs {
   heroTitleRef: React.RefObject<HTMLHeadingElement | null>;
   heroIntroRef: React.RefObject<HTMLParagraphElement | null>;
   heroLineRef: React.RefObject<HTMLDivElement | null>;
+  mobileLineFillRef: React.RefObject<HTMLDivElement | null>;
 }
 
 /** Animacje z GSAP i ScrollTrigger - przywrócone */
@@ -32,6 +33,7 @@ export function useProcessAnimations(
     heroTitleRef,
     heroIntroRef,
     heroLineRef,
+    mobileLineFillRef,
   } = refs;
 
   useLayoutEffect(() => {
@@ -87,11 +89,9 @@ export function useProcessAnimations(
     if (!svgSectionRef.current) return;
 
     const path = isMobile ? pathMobileRef.current : pathRef.current;
-    const svg = path?.closest("svg");
-    if (!path || !svg) return;
 
     const updatePathStartPosition = () => {
-      if (!heroLineRef.current || !svgSectionRef.current || isMobile) return;
+      if (!heroLineRef.current || !svgSectionRef.current || isMobile || !path) return;
 
       const borderRect = heroLineRef.current.getBoundingClientRect();
       const sectionRect = svgSectionRef.current.getBoundingClientRect();
@@ -113,8 +113,19 @@ export function useProcessAnimations(
       path.setAttribute("d", updatedPath);
     };
 
+    const getEasedProgress = (progress: number) => {
+      const slowedProgress = progress * 0.52;
+      if (slowedProgress < 0.4) {
+        return 1 - Math.pow(1 - slowedProgress, 2);
+      }
+      const startValue = 1 - Math.pow(1 - 0.4, 2);
+      const t = (slowedProgress - 0.4) / (0.52 - 0.4);
+      return Math.min(1, startValue + (1 - startValue) * Math.pow(t, 0.7));
+    };
+
     const initAndSetup = () => {
       updatePathStartPosition();
+      if (isMobile || !path) return;
       const pathLength = path.getTotalLength();
       gsap.set(path, {
         strokeDasharray: pathLength,
@@ -123,9 +134,9 @@ export function useProcessAnimations(
     };
 
     const ctx = gsap.context(() => {
-      setTimeout(initAndSetup, 100); // Małe opóźnienie, żeby elementy były już wyrenderowane
+      setTimeout(initAndSetup, 100);
       window.addEventListener("resize", initAndSetup);
-      window.addEventListener("scroll", updatePathStartPosition); // Tylko aktualizacja pozycji przy scroll, bez resetowania animacji
+      window.addEventListener("scroll", updatePathStartPosition);
 
       ScrollTrigger.create({
         trigger: svgSectionRef.current,
@@ -134,21 +145,17 @@ export function useProcessAnimations(
         scrub: true,
         onUpdate: (self) => {
           const progress = self.progress;
-          const currentPathLength = path.getTotalLength();
-          const slowedProgress = progress * 0.52;
-          let easedProgress;
-          if (slowedProgress < 0.4) {
-            easedProgress = 1 - Math.pow(1 - slowedProgress, 2);
-          } else {
-            const startValue = 1 - Math.pow(1 - 0.4, 2);
-            const t = (slowedProgress - 0.4) / (0.52 - 0.4);
-            easedProgress = startValue + (1 - startValue) * Math.pow(t, 0.7);
+          const easedProgress = getEasedProgress(progress);
+
+          if (isMobile && mobileLineFillRef.current) {
+            mobileLineFillRef.current.style.height = `${easedProgress * 100}%`;
+          } else if (path) {
+            const currentPathLength = path.getTotalLength();
+            gsap.set(path, {
+              strokeDashoffset: currentPathLength * (1 - easedProgress),
+              force3D: true,
+            });
           }
-          easedProgress = Math.min(1, easedProgress);
-          gsap.set(path, {
-            strokeDashoffset: currentPathLength * (1 - easedProgress),
-            force3D: true,
-          });
         },
       });
     }, svgSectionRef.current);
@@ -158,7 +165,7 @@ export function useProcessAnimations(
       window.removeEventListener("scroll", updatePathStartPosition);
       ctx.revert();
     };
-  }, [pathRef, pathMobileRef, svgSectionRef, heroLineRef, isMobile]);
+  }, [pathRef, pathMobileRef, svgSectionRef, heroLineRef, isMobile, mobileLineFillRef]);
 
   useEffect(() => {
     if (!svgSectionRef.current) return;
@@ -174,16 +181,16 @@ export function useProcessAnimations(
     const ctx = gsap.context(() => {
       const cards = cardRefs.current.filter(Boolean);
 
-      cards.forEach((card) => {
+      cards.forEach((card, index) => {
         if (!card) return;
         const sectionColor =
           card.getAttribute("data-section-color") || "#00f0ff";
-
+        const isFirstCard = index === 0;
         ScrollTrigger.create({
           trigger: card,
-          start: "top 58%",
-          end: "top 10%",
-          scrub: 0.8,
+          start: isFirstCard ? "top 28%" : "top 42%",
+          end: "top 5%",
+          scrub: 1.4,
           onUpdate: (self) => {
             const progress = self.progress;
             const glowIntensity = Math.sin(progress * Math.PI);
