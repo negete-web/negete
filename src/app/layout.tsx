@@ -6,6 +6,7 @@ import { defaultLanguage, languages, type Language } from "@/i18n/config";
 import Aurora from "./components/Aurora";
 import AppShell from "./components/AppShell";
 import { OrganizationJsonLd, WebSiteJsonLd } from "./components/JsonLd";
+import SmoothScrollLayout from "./components/SmoothScrollLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,8 +59,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased`}
-      >
+        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} antialiased`}>
         <div
           className="fixed inset-0 pointer-events-none"
           style={{ zIndex: -1 }}>
@@ -70,6 +70,7 @@ export default async function RootLayout({
             speed={0.7}
           />
         </div>
+
         <AppShell>{children}</AppShell>
       </body>
     </html>

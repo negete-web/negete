@@ -103,7 +103,10 @@ export default function ProcessPage({
         ref={svgSectionRef}
         className="relative lg:h-[500vh] lg:min-h-[3200px] min-h-[260vh] h-full overflow-hidden lg:-mt-[40vh] isolate">
         {/* Na mobile: prosta linia w HTML na środku ekranu */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-white/10 z-[1] lg:hidden" aria-hidden />
+        <div
+          className="absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2 bg-white/10 z-[1] lg:hidden"
+          aria-hidden
+        />
         <div
           ref={mobileLineFillRef}
           className="absolute left-1/2 top-0 w-0.5 -translate-x-1/2 origin-top z-[1] lg:hidden"
@@ -114,7 +117,7 @@ export default function ProcessPage({
           }}
           aria-hidden
         />
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute max-w-7xl mx-auto inset-0 z-0 pointer-events-none">
           <svg
             className="absolute inset-0 w-full px-12 h-full hidden lg:block"
             viewBox="-50 100 900 2700"
