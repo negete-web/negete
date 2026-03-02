@@ -187,7 +187,7 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16 lg:items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16">
           {leftServices.map((leftService, rowIndex) => {
             const rightService = rightServices[rowIndex];
 
@@ -203,11 +203,11 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
               return (
                 <Link
                   href={href}
-                  className="service-card flex items-start gap-4 group">
+                  className="service-card flex items-start gap-4 group h-full">
                   <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <div>
+                  <div className="flex flex-col justify-between flex-1 h-full">
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
                       {service.title}
                     </h3>
