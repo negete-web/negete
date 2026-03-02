@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, Fragment } from "react";
 import Link from "next/link";
 import { Cpu, Code, Box, Zap, Award, Factory } from "lucide-react";
 import gsap from "gsap";
@@ -22,52 +22,6 @@ const ICONS = {
   Award,
   Factory,
 } as const;
-
-const FALLBACK_SERVICES: ServiceItem[] = [
-  {
-    iconKey: "Cpu",
-    title: "Projektowanie Elektroniki & PCB",
-    description:
-      "Schematy ideowe, obwody wielowarstwowe, symulacje oraz projektowanie pod kątem kompatybilności elektromagnetycznej (EMC/EMI).",
-    slug: "projektowanie-pcb",
-  },
-  {
-    iconKey: "Code",
-    title: "Firmware & Embedded",
-    description:
-      "Oprogramowanie wbudowane (C/C++), sterowniki mikrokontrolerów, systemy IoT oraz bezpieczna komunikacja bezprzewodowa.",
-    slug: "firmware",
-  },
-  {
-    iconKey: "Box",
-    title: "Mechanika & Wzornictwo",
-    description:
-      "Projekty obudów w CAD 3D, dobór materiałów, projektowanie form wtryskowych oraz pełna dokumentacja techniczna 2D/3D.",
-    slug: "mechanika",
-  },
-  {
-    iconKey: "Zap",
-    title: "Szybkie Prototypowanie",
-    description:
-      "Weryfikacja koncepcji poprzez druk 3D, frezowanie CNC oraz montaż próbny układów elektronicznych (PCBA).",
-    slug: "prototypowanie",
-  },
-  {
-    iconKey: "Award",
-    title: "Certyfikacja i Testy",
-    description:
-      "Przygotowanie produktu do oznaczenia znakiem CE, badania wstępne oraz tworzenie dokumentacji wymaganej prawem.",
-    slug: "certyfikacja",
-  },
-  {
-    iconKey: "Factory",
-    title: "Produkcja Seryjna",
-    description:
-      "Organizacja łańcucha dostaw, nadzór nad produkcją elektroniki, kontrola jakości i skalowanie produkcji.",
-    slug: "produkcja",
-  },
-];
-
 interface ServicesProps {
   lang?: Language;
   initialData?: ServicesSection | null;
@@ -84,7 +38,6 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
   const leftTextRef = useRef<HTMLDivElement>(null);
   const rightTextRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const featuresRef = useRef<(HTMLDivElement | HTMLAnchorElement | null)[]>([]);
 
   useEffect(() => {
     if (initialData) return;
@@ -166,35 +119,43 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
           },
         );
       }
-
-      featuresRef.current.forEach((feature, index) => {
-        if (feature) {
-          gsap.fromTo(
-            feature,
-            { opacity: 0, y: 30 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              delay: 0.4 + index * 0.1,
-              force3D: true,
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top 80%",
-              },
-            },
-          );
-        }
-      });
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const services =
-    servicesData?.services && servicesData.services.length > 0
-      ? servicesData.services
-      : FALLBACK_SERVICES;
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const items =
+      sectionRef.current.querySelectorAll<HTMLElement>(".service-card");
+    if (items.length === 0) return;
+    const ctx = gsap.context(() => {
+      items.forEach((item, index) => {
+        gsap.fromTo(
+          item,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: 0.4 + index * 0.1,
+            force3D: true,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 80%",
+            },
+          },
+        );
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [servicesData]);
+
+  const services = servicesData?.services ?? [];
+
+  const half = Math.ceil(services.length / 2);
+  const leftServices = services.slice(0, half);
+  const rightServices = services.slice(half);
 
   return (
     <section
@@ -226,9 +187,11 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16">
-          <div className="space-y-8">
-            {services.slice(0, 3).map((service, index) => {
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16 lg:items-start">
+          {leftServices.map((leftService, rowIndex) => {
+            const rightService = rightServices[rowIndex];
+
+            const renderCard = (service: ServiceItem) => {
               const Icon =
                 ICONS[
                   (service.iconKey as keyof typeof ICONS) ??
@@ -237,8 +200,10 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
               const href = service.slug
                 ? getPath(`/uslugi/${service.slug}`)
                 : getPath("/uslugi");
-              const content = (
-                <>
+              return (
+                <Link
+                  href={href}
+                  className="service-card flex items-start gap-4 group">
                   <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
                     <Icon className="w-6 h-6 text-white" />
                   </div>
@@ -250,62 +215,18 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
                       {service.description}
                     </p>
                   </div>
-                </>
-              );
-              return (
-                <Link
-                  key={service.title}
-                  href={href}
-                  ref={(el) => {
-                    if (el) featuresRef.current[index] = el;
-                  }}
-                  className="flex items-start gap-4 group opacity-0">
-                  {content}
                 </Link>
               );
-            })}
-          </div>
+            };
 
-          <div className="hidden lg:block relative h-full"></div>
-
-          <div className="space-y-8">
-            {services.slice(3, 6).map((service, index) => {
-              const Icon =
-                ICONS[
-                  (service.iconKey as keyof typeof ICONS) ??
-                    ("Cpu" as keyof typeof ICONS)
-                ] ?? Cpu;
-              const href = service.slug
-                ? getPath(`/uslugi/${service.slug}`)
-                : getPath("/uslugi");
-              const content = (
-                <>
-                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                      {service.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                      {service.description}
-                    </p>
-                  </div>
-                </>
-              );
-              return (
-                <Link
-                  key={service.title}
-                  href={href}
-                  ref={(el) => {
-                    if (el) featuresRef.current[index + 3] = el;
-                  }}
-                  className="flex items-start gap-4 group opacity-0">
-                  {content}
-                </Link>
-              );
-            })}
-          </div>
+            return (
+              <Fragment key={leftService.title}>
+                {renderCard(leftService)}
+                <div className="hidden lg:block" />
+                {rightService ? renderCard(rightService) : <div />}
+              </Fragment>
+            );
+          })}
         </div>
       </div>
     </section>

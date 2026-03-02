@@ -75,7 +75,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
         }
 
         gsap.to(rocketRef.current, {
-          y: 20,
+          y: 120,
           x: 0,
           xPercent: -50,
           opacity: 1,
@@ -87,7 +87,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
           onComplete: () => {
             if (rocketRef.current) {
               gsap.to(rocketRef.current, {
-                y: 20 - 20,
+                y: 100,
                 duration: 1.5,
                 ease: "sine.inOut",
                 yoyo: true,
@@ -97,7 +97,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
             }
             if (glowRef.current) {
               gsap.to(glowRef.current, {
-                y: 20 - 20,
+                y: 100,
                 duration: 1.5,
                 ease: "sine.inOut",
                 yoyo: true,
@@ -109,7 +109,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
         });
         if (glowRef.current) {
           gsap.to(glowRef.current, {
-            y: 20,
+            y: 120,
             x: 0,
             xPercent: -50,
             opacity: 1,
@@ -230,7 +230,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
           maxHeight: "510px",
           overflow: "visible",
           left: "50%",
-          top: "60%",
+          top: "70%",
           transform: "translate(-50%, -50%)",
           zIndex: 1,
           visibility: "hidden",
