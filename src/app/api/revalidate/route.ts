@@ -37,13 +37,13 @@ export async function POST(req: NextRequest) {
 
     // Jeśli mamy konkretny slug projektu, inwaliduj też tag dla tego sluga
     if (slug && docType === "project") {
-      revalidateTag(`project-${slug}`);
+      revalidateTag(`project-${slug}`, "max");
     }
     if (slug && docType === "post") {
-      revalidateTag(`post-${slug}`);
+      revalidateTag(`post-${slug}`, "max");
     }
 
-    tags.forEach((tag) => revalidateTag(tag));
+    tags.forEach((tag) => revalidateTag(tag, "max"));
 
     return NextResponse.json({ revalidated: true, type: docType ?? "unknown", tags });
   } catch {
