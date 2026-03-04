@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import ImageLightbox from "./ImageLightbox";
 
 type ImageItem = { url: string; alt?: string };
@@ -36,30 +35,27 @@ export default function ProjectGallery({
 
   return (
     <section className="space-y-6">
-      {title && (
-        <h2 className="text-xl font-medium text-white">{title}</h2>
-      )}
+      {title && <h2 className="text-xl font-medium text-white">{title}</h2>}
       {description && (
         <p className="text-gray-400 leading-relaxed">{description}</p>
       )}
       {hasImages && (
-      <div className={`grid grid-cols-1 ${gridCols} gap-4`}>
-        {images!.map((img, imgIndex) => (
-          <button
-            key={imgIndex}
-            type="button"
-            onClick={() => openLightbox(imgIndex)}
-            className="relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border border-white/5 text-left transition hover:border-cyan-500/30 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-          >
-            <Image
-              src={img.url}
-              alt={img.alt || ""}
-              fill
-              className="object-cover"
-            />
-          </button>
-        ))}
-      </div>
+        <div className="flex flex-wrap gap-3">
+          {images!.map((img, imgIndex) => (
+            <button
+              key={imgIndex}
+              type="button"
+              onClick={() => openLightbox(imgIndex)}
+              className="cursor-pointer overflow-hidden rounded-xl border border-white/5 text-left transition hover:border-cyan-500/30 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+              style={{ height: "360px" }}>
+              <img
+                src={img.url}
+                alt={img.alt || ""}
+                className="h-full w-auto block"
+              />
+            </button>
+          ))}
+        </div>
       )}
       {lightboxOpen && hasImages && (
         <ImageLightbox

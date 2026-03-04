@@ -41,14 +41,18 @@ export default function Footer() {
     useState<Awaited<ReturnType<typeof fetchFooterData>>>(null);
   const [servicesData, setServicesData] =
     useState<Awaited<ReturnType<typeof fetchServicesSection>>>(null);
-  const [faqItems, setFaqItems] = useState<{ id: number; question: string }[]>([]);
+  const [faqItems, setFaqItems] = useState<{ id: number; question: string }[]>(
+    [],
+  );
 
   useEffect(() => {
     fetchFooterData(lang).then((data) => setFooterData(data));
     fetchServicesSection(lang).then((data) => setServicesData(data));
     fetch(`/api/faq?lang=${lang}`)
       .then((res) => res.json())
-      .then((data: { items?: { id: number; question: string }[] }) => setFaqItems(data.items ?? []))
+      .then((data: { items?: { id: number; question: string }[] }) =>
+        setFaqItems(data.items ?? []),
+      )
       .catch(() => setFaqItems([]));
   }, [lang]);
 
@@ -95,58 +99,49 @@ export default function Footer() {
     return () => ctx.revert();
   }, []);
 
-  const footerLinks = {
-    company: [
-      { name: t(lang, "nav.home"), href: getPath("/"), key: "home" },
-      {
-        name: t(lang, "nav.projects"),
-        href: getPath("/realizacje"),
-        key: "projects",
-      },
-      {
-        name: t(lang, "nav.process"),
-        href: getPath("/proces"),
-        key: "process",
-      },
-      {
-        name: t(lang, "nav.services"),
-        href: getPath("/uslugi"),
-        key: "services",
-      },
-      { name: t(lang, "nav.blog"), href: getPath("/blog"), key: "blog" },
-      { name: t(lang, "nav.faq"), href: getPath("/faq"), key: "faq" },
-    ],
-    services:
-      servicesData?.services && servicesData.services.length > 0
-        ? servicesData.services.map((s) => ({
-            name: s.title,
-            href: s.slug ? getPath(`/uslugi/${s.slug}`) : getPath("/uslugi"),
-            key: s.slug || "service",
-          }))
-        : [
-            { name: "Projektowanie PCB", href: getPath("/uslugi"), key: "pcb" },
-            { name: "Firmware", href: getPath("/uslugi"), key: "firmware" },
-            { name: "Mechanika", href: getPath("/uslugi"), key: "mech" },
-            { name: "Prototypowanie", href: getPath("/uslugi"), key: "proto" },
-          ],
-    legal: [
-      {
-        name: t(lang, "footer.legal.privacy"),
-        href: getPath("/polityka-prywatnosci"),
-        key: "privacy",
-      },
-      {
-        name: t(lang, "footer.legal.terms"),
-        href: getPath("/regulamin"),
-        key: "terms",
-      },
-      {
-        name: t(lang, "footer.legal.cookies"),
-        href: getPath("/cookies"),
-        key: "cookies",
-      },
-    ],
-  };
+  const companyLinks = [
+    { name: t(lang, "nav.home"), href: getPath("/"), key: "home" },
+    {
+      name: t(lang, "nav.projects"),
+      href: getPath("/realizacje"),
+      key: "projects",
+    },
+    { name: t(lang, "nav.process"), href: getPath("/proces"), key: "process" },
+    {
+      name: t(lang, "nav.services"),
+      href: getPath("/uslugi"),
+      key: "services",
+    },
+    { name: t(lang, "nav.blog"), href: getPath("/blog"), key: "blog" },
+    { name: t(lang, "nav.faq"), href: getPath("/faq"), key: "faq" },
+  ];
+
+  const legalLinks = [
+    {
+      name: t(lang, "footer.legal.privacy"),
+      href: getPath("/polityka-prywatnosci"),
+      key: "privacy",
+    },
+    {
+      name: t(lang, "footer.legal.terms"),
+      href: getPath("/regulamin"),
+      key: "terms",
+    },
+    {
+      name: t(lang, "footer.legal.cookies"),
+      href: getPath("/cookies"),
+      key: "cookies",
+    },
+  ];
+
+  const serviceLinks =
+    servicesData?.services && servicesData.services.length > 0
+      ? servicesData.services.map((s, index) => ({
+          name: s.title,
+          href: s.slug ? getPath(`/uslugi/${s.slug}`) : getPath("/uslugi"),
+          key: s.slug ?? `service-${index}`,
+        }))
+      : [];
 
   const socialLinks =
     footerData?.socialLinks && footerData.socialLinks.length > 0
@@ -155,11 +150,7 @@ export default function Footer() {
           href: s.url,
           label: s.icon,
         }))
-      : [
-          { icon: Linkedin, href: "#", label: "LinkedIn" },
-          { icon: Github, href: "#", label: "GitHub" },
-          { icon: Twitter, href: "#", label: "Twitter" },
-        ];
+      : [];
 
   const contactInfo =
     footerData?.contactItems && footerData.contactItems.length > 0
@@ -168,19 +159,9 @@ export default function Footer() {
           text: c.text,
           href: c.url,
         }))
-      : [
-          {
-            icon: Mail,
-            text: "kontakt@negete.pl",
-            href: "mailto:kontakt@negete.pl",
-          },
-          { icon: Phone, text: "+48 123 456 789", href: "tel:+48123456789" },
-          { icon: MapPin, text: "Warszawa, Polska", href: "#" },
-        ];
+      : [];
 
-  const footerDescription =
-    footerData?.description ||
-    "Twój zewnętrzny dział R&D. Od pomysłu do seryjnej produkcji. Profesjonalne usługi w dziedzinie elektroniki, mechaniki i oprogramowania.";
+  const footerDescription = footerData?.description || "";
 
   return (
     <footer
@@ -198,6 +179,7 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          {/* Kolumna 1: logo + opis + kontakt + social */}
           <div
             ref={(el) => {
               sectionsRef.current[0] = el;
@@ -210,69 +192,60 @@ export default function Footer() {
                 className="h-12 mb-4"
               />
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              {footerDescription}
-            </p>
-            <ul className="space-y-2 pt-2">
-              {contactInfo.map((info, index) => {
-                const Icon = info.icon;
-                return (
-                  <li key={index}>
+            {footerDescription && (
+              <p className="text-gray-400 text-sm leading-relaxed">
+                {footerDescription}
+              </p>
+            )}
+            {contactInfo.length > 0 && (
+              <ul className="space-y-2 pt-2">
+                {contactInfo.map((info, index) => {
+                  const Icon = info.icon;
+                  return (
+                    <li key={index}>
+                      <a
+                        href={info.href}
+                        className="flex items-center gap-3 text-gray-400 hover:text-cyan-400 transition-colors text-sm group">
+                        <Icon className="w-4 h-4 group-hover:text-cyan-400 transition-colors shrink-0" />
+                        <span>{info.text}</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {socialLinks.length > 0 && (
+              <div className="flex items-center gap-4 pt-4">
+                {socialLinks.map((social, index) => {
+                  const Icon = social.icon;
+                  return (
                     <a
-                      href={info.href}
-                      className="flex items-center gap-3 text-gray-400 hover:text-cyan-400 transition-colors text-sm group">
-                      <Icon className="w-4 h-4 group-hover:text-cyan-400 transition-colors shrink-0" />
-                      <span>{info.text}</span>
+                      key={index}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={social.label}
+                      className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-cyan-400/20 hover:border-cyan-400/50 border border-white/10 transition-all duration-300 group">
+                      <Icon className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
                     </a>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="flex items-center gap-4 pt-4">
-              {socialLinks.map((social, index) => {
-                const Icon = social.icon;
-                return (
-                  <a
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-cyan-400/20 hover:border-cyan-400/50 border border-white/10 transition-all duration-300 group">
-                    <Icon className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
-                  </a>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
+          {/* Kolumna 2: nawigacja firmowa */}
           <div
             ref={(el) => {
               sectionsRef.current[1] = el;
             }}
             className="space-y-4">
-            <h3 className="text-white font-bold text-lg mb-4">Firma</h3>
+            <h3 className="text-white font-bold text-lg mb-4">
+              {t(lang, "footer.company")}
+            </h3>
             <ul className="space-y-3">
-              {footerLinks.company.map((link, index) => (
-                <li key={index}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 hover:text-cyan-400 transition-colors text-sm">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div
-            ref={(el) => {
-              sectionsRef.current[2] = el;
-            }}
-            className="space-y-4">
-            <h3 className="text-white font-bold text-lg mb-4">Usługi</h3>
-            <ul className="space-y-3">
-              {footerLinks.services.map((link, index) => (
-                <li key={index}>
+              {companyLinks.map((link) => (
+                <li key={link.key}>
                   <Link
                     href={link.href}
                     className="text-gray-400 hover:text-cyan-400 transition-colors text-sm">
@@ -283,26 +256,53 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div
-            ref={(el) => {
-              sectionsRef.current[3] = el;
-            }}
-            className="space-y-4">
-            <h3 className="text-white font-bold text-lg mb-4">
-              {t(lang, "footer.faqDefault")}
-            </h3>
-            <ul className="space-y-3">
-              {faqItems.map((item) => (
-                <li key={item.id}>
-                  <Link
-                    href={`${getPath("/faq")}#faq-${item.id}`}
-                    className="text-gray-400 hover:text-cyan-400 transition-colors text-sm line-clamp-2">
-                    {item.question}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Kolumna 3: usługi (tylko jeśli są dane z Sanity) */}
+          {serviceLinks.length > 0 && (
+            <div
+              ref={(el) => {
+                sectionsRef.current[2] = el;
+              }}
+              className="space-y-4">
+              <h3 className="text-white font-bold text-lg mb-4">
+                {t(lang, "footer.services")}
+              </h3>
+              <ul className="space-y-3">
+                {serviceLinks.map((link, index) => (
+                  <li key={index}>
+                    <Link
+                      href={link.href}
+                      className="text-gray-400 hover:text-cyan-400 transition-colors text-sm">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Kolumna 4: FAQ (tylko jeśli są pytania) */}
+          {faqItems.length > 0 && (
+            <div
+              ref={(el) => {
+                sectionsRef.current[3] = el;
+              }}
+              className="space-y-4">
+              <h3 className="text-white font-bold text-lg mb-4">
+                {t(lang, "footer.faqDefault")}
+              </h3>
+              <ul className="space-y-3">
+                {faqItems.map((item) => (
+                  <li key={item.id}>
+                    <Link
+                      href={`${getPath("/faq")}#faq-${item.id}`}
+                      className="text-gray-400 hover:text-cyan-400 transition-colors text-sm line-clamp-2">
+                      {item.question}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div className="border-t border-white/10 pt-8 mt-8">
@@ -325,7 +325,7 @@ export default function Footer() {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <LanguageSwitcher variant="footer" />
-              {footerLinks.legal.map((link, index) => (
+              {legalLinks.map((link, index) => (
                 <Link
                   key={index}
                   href={link.href}

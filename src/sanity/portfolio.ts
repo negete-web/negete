@@ -3,33 +3,12 @@ import { sanityClient } from "./client";
 import type { Language } from "@/i18n/config";
 import { urlFor } from "./image";
 
-const CATEGORY_LABELS: Record<string, { pl: string; en: string }> = {
-  "elektronika-pcb": { pl: "Elektronika & PCB", en: "Electronics & PCB" },
-  "firmware-embedded": { pl: "Firmware & Embedded", en: "Firmware & Embedded" },
-  "mechanika-wzornictwo": {
-    pl: "Mechanika & Wzornictwo",
-    en: "Mechanics & Design",
-  },
-  "iot-automatyka": { pl: "IoT & Automatyka", en: "IoT & Automation" },
-  medycyna: {
-    pl: "Medycyna & Sprzęt Medyczny",
-    en: "Medical & Medical Equipment",
-  },
-  motoryzacja: { pl: "Motoryzacja", en: "Automotive" },
-  wearables: { pl: "Wearables", en: "Wearables" },
-  inne: { pl: "Inne", en: "Other" },
-};
-
 function getCategoryLabel(
-  category?: string,
-  customCategory?: string,
+  category?: { titlePl?: string; titleEn?: string },
   lang: Language = "pl",
 ): string | undefined {
-  if (customCategory) return customCategory;
-  if (category && CATEGORY_LABELS[category]) {
-    return CATEGORY_LABELS[category][lang];
-  }
-  return undefined;
+  if (!category) return undefined;
+  return (lang === "en" ? category.titleEn : category.titlePl) || category.titlePl;
 }
 
 export interface Project {
@@ -65,8 +44,7 @@ interface ProjectRaw {
   gridSpan?: string;
   descriptionPl?: string;
   descriptionEn?: string;
-  category?: string;
-  customCategory?: string;
+  category?: { titlePl?: string; titleEn?: string; slug?: { current?: string } };
   sections?: any[];
   gallery?: Array<
     SanityImageSource & {
@@ -121,8 +99,7 @@ export async function fetchPortfolioSection(
         gridSpan,
         descriptionPl,
         descriptionEn,
-        category,
-        customCategory
+        category->{ titlePl, titleEn, slug }
       }
     }
   `;
@@ -142,30 +119,26 @@ export async function fetchPortfolioSection(
 
   const projects: Project[] =
     data.projects?.map((project) => {
-      const categoryLabel = getCategoryLabel(
-        project.category,
-        project.customCategory,
-        lang,
-      );
+      const categoryLabel = getCategoryLabel(project.category, lang);
       return {
         _id: project._id,
         title: project[titleKey] || project.titlePl || "",
         slug: project.slug?.current || "",
         image: project.mainImage
-          ? urlFor(project.mainImage).width(800).height(600).url()
+          ? urlFor(project.mainImage).width(800).url()
           : "",
         imageAlt: project.mainImage?.[altKey] || project.mainImage?.altPl || "",
         gridSpan: project.gridSpan || "md:col-span-1 md:row-span-1",
         description: project[projectDescriptionKey] || project.descriptionPl,
-        category: project.customCategory || project.category,
+        category: project.category?.slug?.current,
         categoryLabel,
       };
     }) || [];
 
   return {
     _id: data._id,
-    heading: data[headingKey] || data.headingPl || "",
-    description: data[descriptionKey] || data.descriptionPl,
+    heading: data[headingKey] || "",
+    description: data[descriptionKey] || undefined,
     projects,
   };
 }
@@ -211,8 +184,7 @@ export async function fetchProjectBySlug(
       gridSpan,
       descriptionPl,
       descriptionEn,
-      category,
-      customCategory,
+      category->{ titlePl, titleEn, slug },
       sections[]{
         _type,
         _type == "heroSection" => {
@@ -289,11 +261,7 @@ export async function fetchProjectBySlug(
   const descriptionKey = lang === "pl" ? "descriptionPl" : "descriptionEn";
   const altKey = lang === "pl" ? "altPl" : "altEn";
 
-  const categoryLabel = getCategoryLabel(
-    data.category,
-    data.customCategory,
-    lang,
-  );
+  const categoryLabel = getCategoryLabel(data.category, lang);
 
   const mappedSections = data.sections?.map((section: any) => {
     const mapped: any = { _type: section._type };
@@ -384,12 +352,12 @@ export async function fetchProjectBySlug(
     title: data[titleKey] || data.titlePl || "",
     slug: data.slug?.current || "",
     image: data.mainImage
-      ? urlFor(data.mainImage).width(1200).height(800).fit("clip").url()
+      ? urlFor(data.mainImage).width(1200).url()
       : "",
     imageAlt: data.mainImage?.[altKey] || data.mainImage?.altPl || "",
     gridSpan: data.gridSpan || "md:col-span-1 md:row-span-1",
     description: data[descriptionKey] || data.descriptionPl,
-    category: data.customCategory || data.category,
+    category: data.category?.slug?.current,
     categoryLabel,
     sections: mappedSections,
     gallery,
@@ -419,8 +387,7 @@ export async function fetchAllProjects(
       gridSpan,
       descriptionPl,
       descriptionEn,
-      category,
-      customCategory,
+      category->{ titlePl, titleEn, slug },
       publishedAt
     }
   `;
@@ -432,22 +399,18 @@ export async function fetchAllProjects(
   const altKey = lang === "pl" ? "altPl" : "altEn";
 
   return data.map((project) => {
-    const categoryLabel = getCategoryLabel(
-      project.category,
-      project.customCategory,
-      lang,
-    );
+    const categoryLabel = getCategoryLabel(project.category, lang);
     return {
       _id: project._id,
       title: project[titleKey] || project.titlePl || "",
       slug: project.slug?.current || "",
       image: project.mainImage
-        ? urlFor(project.mainImage).width(800).height(600).url()
+        ? urlFor(project.mainImage).width(800).url()
         : "",
       imageAlt: project.mainImage?.[altKey] || project.mainImage?.altPl || "",
       gridSpan: project.gridSpan || "md:col-span-1 md:row-span-1",
       description: project[descriptionKey] || project.descriptionPl,
-      category: project.customCategory || project.category,
+      category: project.category?.slug?.current,
       categoryLabel,
     };
   });

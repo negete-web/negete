@@ -32,7 +32,8 @@ const MOCK_FAQ: {
   },
   {
     questionPl: "Ile trwa typowy projekt od koncepcji do prototypu?",
-    questionEn: "How long does a typical project take from concept to prototype?",
+    questionEn:
+      "How long does a typical project take from concept to prototype?",
     answerPl:
       "Zależy od złożoności: proste projekty elektroniczne 2–4 miesiące, pełny produkt z obudową i oprogramowaniem 4–8 miesięcy. Po wstępnej rozmowie przedstawimy harmonogram.",
     answerEn:
@@ -92,24 +93,33 @@ export default async function FaqPage({ params }: Props) {
   ]);
 
   const items: FaqItem[] =
-    faqData && faqData.items?.length ? faqData.items : getMockFaqItems(lang as Language);
+    faqData && faqData.items?.length
+      ? faqData.items
+      : getMockFaqItems(lang as Language);
   const heading = faqData?.heading ?? t(lang as Language, "faq.title");
   const subtitle = faqData?.subtitle;
 
-  const faqItemsForSeo = items.map((i) => ({ question: i.question, answer: i.answer }));
+  const faqItemsForSeo = items.map((i) => ({
+    question: i.question,
+    answer: i.answer,
+  }));
 
   return (
-    <main id="main-content" className="relative min-h-screen">
+    <main id="main-content" className="relative pt-16 min-h-screen">
       <FaqPageJsonLd items={faqItemsForSeo} lang={lang} url={`/${lang}/faq`} />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="mb-12">
-          <h1 className="text-3xl sm:text-4xl font-medium text-white mb-4">{heading}</h1>
+        <div className="mb-6 md:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-medium text-white ">
+            {heading}
+          </h1>
           {subtitle && <p className="text-gray-400 text-lg">{subtitle}</p>}
         </div>
         {items.length > 0 ? (
           <FaqAccordion items={items} />
         ) : (
-          <p className="text-gray-400">{t(lang as Language, "faq.noQuestions")}</p>
+          <p className="text-gray-400">
+            {t(lang as Language, "faq.noQuestions")}
+          </p>
         )}
       </div>
       <Footer />

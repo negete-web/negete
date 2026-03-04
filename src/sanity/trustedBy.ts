@@ -69,8 +69,8 @@ export async function fetchTrustedBy(
     })) || [];
 
   return {
-    heading: data[headingKey] || data.headingPl || "",
-    subtitle: data[subtitleKey] || data.subtitlePl,
+    heading: data[headingKey] || "",
+    subtitle: data[subtitleKey] || undefined,
     companies,
   };
 }

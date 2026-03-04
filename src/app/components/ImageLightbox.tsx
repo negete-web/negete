@@ -87,12 +87,12 @@ export default function ImageLightbox({
       )}
 
       <div
-        className="relative max-h-[90vh] w-full max-w-6xl px-16"
+        className="relative flex max-h-[90vh] w-full max-w-6xl items-center justify-center px-16"
         onClick={(e) => e.stopPropagation()}>
         <img
           src={current.url}
           alt={current.alt || ""}
-          className="max-h-[90vh] w-auto object-contain"
+          className="mx-auto block max-h-[90vh] w-auto object-contain"
         />
       </div>
 

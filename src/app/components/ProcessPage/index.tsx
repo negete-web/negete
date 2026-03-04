@@ -62,13 +62,18 @@ export default function ProcessPage({
       : FALLBACK_STEPS;
   const hasFiveSections = sections.length === 5;
   const sectionsToRender = hasFiveSections ? sections : sections.slice(0, 4);
-  const heading = processData?.heading || "Nasz proces";
-  const intro = processData?.intro || "Od pomysłu do realizacji";
+  const heading =
+    processData?.heading || (lang === "en" ? "Our process" : "Nasz proces");
+  const intro =
+    processData?.intro ||
+    (lang === "en" ? "From idea to realization" : "Od pomysłu do realizacji");
   const cta: ProcessPageCta = processData?.cta ?? {
-    title: "Gotowy na start?",
+    title: lang === "en" ? "Ready to start?" : "Gotowy na start?",
     description:
-      "Każdy wielki projekt zaczyna się od pierwszego kroku. Porozmawiajmy o Twoich celach.",
-    buttonText: "Skontaktuj się",
+      lang === "en"
+        ? "Every great project starts with the first step. Let's talk about your goals."
+        : "Każdy wielki projekt zaczyna się od pierwszego kroku. Porozmawiajmy o Twoich celach.",
+    buttonText: lang === "en" ? "Contact us" : "Skontaktuj się",
     link: `/${lang}/kontakt`,
   };
 
@@ -314,14 +319,14 @@ export default function ProcessPage({
                     </div>
                   </div>
                   <div
-                    className={`absolute backdrop-blur-lg z-20 w-[min(520px,48vw)] ${cardPositionClasses}`}
+                    className={`absolute bg-black/35 backdrop-blur-lg z-20 w-[min(520px,48vw)] ${cardPositionClasses}`}
                     style={{ top: cardTop }}>
                     <div
                       ref={(el) => {
                         cardRefs.current[index] = el;
                       }}
                       data-section-color={section.color}
-                      className="bg-white/3 relative backdrop-blur-lg rounded-2xl p-8 sm:p-10 border border-white/10 shadow-xl">
+                      className="bg-white/5 relative backdrop-blur-lg rounded-2xl p-8 sm:p-10 border border-white/15 shadow-xl">
                       <span
                         className="inline-block text-xs font-semibold tracking-wider uppercase mb-3"
                         style={{ color: section.color }}>
@@ -352,6 +357,11 @@ export default function ProcessPage({
                             </div>
                           ))}
                         </div>
+                      )}
+                      {section.secondDescription && (
+                        <p className="text-gray-400 leading-relaxed text-base mt-6">
+                          {section.secondDescription}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -414,7 +424,7 @@ export default function ProcessPage({
                       cardRefs.current[index] = el;
                     }}
                     data-section-color={section.color}
-                    className="relative z-10 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl">
+                    className="relative z-10 bg-white/12 backdrop-blur-sm rounded-2xl p-6 border border-white/15 shadow-xl">
                     <span
                       className="inline-block text-xs font-semibold tracking-wider uppercase mb-2"
                       style={{ color: section.color }}>
@@ -445,6 +455,11 @@ export default function ProcessPage({
                           </div>
                         ))}
                       </div>
+                    )}
+                    {section.secondDescription && (
+                      <p className="text-gray-400 leading-relaxed text-sm mt-4">
+                        {section.secondDescription}
+                      </p>
                     )}
                   </div>
                 </div>

@@ -52,10 +52,17 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
 
   return (
     <>
-      <main id="main-content" className="min-h-screen ">
+      <main id="main-content" className="min-h-screen overflow-hidden">
+        {/* Tło — rozmyte plamy neonowe */}
+        <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[120px]" />
+          <div className="absolute top-1/3 -right-40 w-[400px] h-[400px] rounded-full bg-blue-600/8 blur-[100px]" />
+          <div className="absolute bottom-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-violet-500/6 blur-[100px]" />
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-26 md:py-36">
           <div className="mb-12 lg:mb-16">
-            <h1 className="text-3xl sm:text-4xl font-medium text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-medium mb-6 leading-tight bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent">
               {t(lang as Language, "realizacje.title")}
             </h1>
             <p className="text-lg sm:text-xl text-gray-400 max-w-2xl">
@@ -104,17 +111,12 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
                   <Link
                     key={project._id}
                     href={`/${lang}/realizacje/${project.slug}`}
-                    className="group relative overflow-hidden rounded-2xl lg:rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-cyan-400/50 transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-500/20 hover:-translate-y-1">
-                    <div className="aspect-video relative overflow-hidden">
-                      <Image
-                        src={project.image}
-                        alt={project.imageAlt || project.title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    className="group flex flex-col rounded-2xl lg:rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-cyan-400/40 transition-all duration-500 hover:shadow-xl hover:shadow-cyan-500/15 hover:-translate-y-1 relative overflow-hidden">
+                    {/* Neonowa linia na górze karty */}
+                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="p-3">
                       {project.categoryLabel && (
-                        <div className="absolute top-4 left-4 z-10">
+                        <div className="absolute top-5 left-5 z-10">
                           <Badge
                             variant="outline"
                             className="bg-black/70 backdrop-blur-md border-cyan-400/60 text-cyan-400 text-xs font-medium px-3 py-1 shadow-lg">
@@ -122,8 +124,15 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
                           </Badge>
                         </div>
                       )}
+                      <div className=" max-h-[250px] h-full  flex items-center justify-center">
+                        <img
+                          src={project.image}
+                          alt={project.imageAlt || project.title}
+                          className=" object-contain  h-full  rounded-xl"
+                        />
+                      </div>
                     </div>
-                    <div className="p-6 lg:p-8">
+                    <div className="p-5 lg:p-6 pt-2">
                       <h3 className="text-xl lg:text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors duration-300">
                         {project.title}
                       </h3>

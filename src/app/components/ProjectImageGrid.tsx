@@ -57,13 +57,13 @@ export default function ProjectImageGrid({
                   );
                   openLightbox(imgIndex >= 0 ? imgIndex : 0);
                 }}
-                className="relative block w-full aspect-[4/3] overflow-hidden cursor-pointer transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-inset"
+                className="relative block w-full aspect-[4/3] overflow-hidden cursor-pointer bg-black/20 transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-inset"
               >
                 <Image
                   src={item.image.url}
                   alt={item.image.alt || item.title || ""}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
               </button>
             )}

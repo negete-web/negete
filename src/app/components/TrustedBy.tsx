@@ -47,8 +47,8 @@ export default function TrustedBy({
   }, [lang, initialData]);
 
   const companies = trustedByData?.companies || FALLBACK_COMPANIES;
-  const heading = trustedByData?.heading || "Zaufali nam";
-  const subtitle = trustedByData?.subtitle || "Nasi partnerzy i klienci";
+  const heading = trustedByData?.heading || (lang === "en" ? "Trusted by" : "Zaufali nam");
+  const subtitle = trustedByData?.subtitle || (lang === "en" ? "Our partners and clients" : "Nasi partnerzy i klienci");
 
   useEffect(() => {
     const ctx = gsap.context(() => {

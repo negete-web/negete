@@ -22,31 +22,13 @@ export const processPage = defineType({
       title: "Wstęp / krótki opis (Polski)",
       type: "text",
       rows: 3,
-      description: "Krótki opis wyświetlany w sekcji hero nad zdjęciem głównym.",
+      description: "Krótki opis wyświetlany w sekcji hero.",
     }),
     defineField({
       name: "introEn",
       title: "Wstęp / krótki opis (English)",
       type: "text",
       rows: 3,
-    }),
-    defineField({
-      name: "heroImage",
-      title: "Zdjęcie główne",
-      type: "image",
-      options: { hotspot: true },
-      fields: [
-        {
-          name: "altPl",
-          title: "Tekst alternatywny (Polski)",
-          type: "string",
-        },
-        {
-          name: "altEn",
-          title: "Tekst alternatywny (English)",
-          type: "string",
-        },
-      ],
     }),
     defineField({
       name: "headingPl",
@@ -178,6 +160,19 @@ export const processPage = defineType({
               type: "string",
               description: "Kolor w formacie hex, np. #00f0ff",
               initialValue: "#00f0ff",
+            }),
+            defineField({
+              name: "secondDescriptionPl",
+              title: "Drugi opis (Polski)",
+              type: "text",
+              rows: 3,
+              description: "Wyświetlany pod listą szczegółów",
+            }),
+            defineField({
+              name: "secondDescriptionEn",
+              title: "Drugi opis (English)",
+              type: "text",
+              rows: 3,
             }),
             defineField({
               name: "details",

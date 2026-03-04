@@ -120,7 +120,7 @@ export default function Portfolio({
       <div className="max-w-7xl mx-auto">
         <div className="text-center flex justify-between ">
           <h2 className="text-3xl sm:text-4xl font-medium text-white tracking-tight mb-4">
-            {portfolioData?.heading ?? "Portfolio"}
+            {portfolioData?.heading || (lang === "en" ? "Our projects" : "Nasze realizacje")}
           </h2>
 
           <Link href={getPath("/realizacje")} className="group inline-block">

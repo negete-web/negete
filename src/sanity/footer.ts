@@ -47,10 +47,7 @@ export async function fetchFooterData(
 
     const descKey =
       lang === "pl" ? "footerDescriptionPl" : "footerDescriptionEn";
-    const description =
-      data[descKey] ||
-      data.footerDescriptionPl ||
-      "Twój zewnętrzny dział R&D. Od pomysłu do seryjnej produkcji.";
+    const description = data[descKey] || data.footerDescriptionPl || "";
 
     const textKey = lang === "pl" ? "textPl" : "textEn";
     const contactItems: FooterContactItem[] = (
@@ -71,11 +68,6 @@ export async function fetchFooterData(
     return { description, contactItems, socialLinks };
   } catch (error) {
     console.error("Error fetching footer data:", error);
-    return {
-      description:
-        "Twój zewnętrzny dział R&D. Od pomysłu do seryjnej produkcji.",
-      contactItems: [],
-      socialLinks: [],
-    };
+    return null;
   }
 }

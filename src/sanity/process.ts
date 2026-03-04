@@ -22,6 +22,7 @@ export interface ProcessSection {
   id: number;
   title: string;
   description: string;
+  secondDescription?: string;
   image?: {
     url: string;
     alt: string;
@@ -48,10 +49,6 @@ export interface ProcessPageSeo {
 export interface ProcessPageData {
   heading: string;
   intro?: string;
-  heroImage?: {
-    url: string;
-    alt: string;
-  };
   sections: ProcessSection[];
   cta: ProcessPageCta;
   seo?: ProcessPageSeo;
@@ -127,11 +124,6 @@ export async function fetchProcessPage(
     *[_type == "processPage"][0]{
       introPl,
       introEn,
-      heroImage{
-        ...,
-        altPl,
-        altEn
-      },
       headingPl,
       headingEn,
       seo{ metaTitlePl, metaTitleEn, metaDescriptionPl, metaDescriptionEn, ogImage{ ... } },
@@ -153,6 +145,8 @@ export async function fetchProcessPage(
         titleEn,
         descriptionPl,
         descriptionEn,
+        secondDescriptionPl,
+        secondDescriptionEn,
         color,
         details[]{
           textPl,
@@ -174,11 +168,14 @@ export async function fetchProcessPage(
   const altKey = lang === "pl" ? "altPl" : "altEn";
   const textKey = lang === "pl" ? "textPl" : "textEn";
 
+  const secondDescriptionKey = lang === "pl" ? "secondDescriptionPl" : "secondDescriptionEn";
+
   const sections: ProcessSection[] =
     data.sections?.map((section: any, index: number) => ({
       id: index,
       title: section[titleKey] || section.titlePl || "",
       description: section[descriptionKey] || section.descriptionPl || "",
+      secondDescription: section[secondDescriptionKey] || section.secondDescriptionPl || undefined,
       image: section.image
         ? {
             url: urlFor(section.image).width(1200).url(),
@@ -224,12 +221,6 @@ export async function fetchProcessPage(
   return {
     heading: data[headingKey] || data.headingPl || "",
     intro: data[introKey] || data.introPl || "",
-    heroImage: data.heroImage
-      ? {
-          url: urlFor(data.heroImage).ignoreImageParams().width(1920).height(1080).fit('clip').url(),
-          alt: data.heroImage[altKey] || data.heroImage.altPl || "",
-        }
-        : undefined,
     sections,
     cta,
     seo,

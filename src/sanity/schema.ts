@@ -1,5 +1,6 @@
 import { servicesSection } from "./schemaTypes/servicesSection";
 import { project } from "./schemaTypes/project";
+import { projectCategory } from "./schemaTypes/projectCategory";
 import { portfolioSection } from "./schemaTypes/portfolioSection";
 import { homepageProcess } from "./schemaTypes/homepageProcess";
 import { processPage } from "./schemaTypes/processPage";
@@ -16,6 +17,7 @@ export const schemaTypes = [
   seoFields,
   siteSettings,
   servicesSection,
+  projectCategory,
   project,
   portfolioSection,
   homepageProcess,

@@ -66,6 +66,34 @@ a:focus-visible {
   border-radius: 0.25rem;
 }
 
+/* Custom scrollbar */
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.4) #0a0a0a;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 6px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.4);
+  border-radius: 999px;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.7);
+}
+
 html {
   scroll-behavior: smooth;
 }

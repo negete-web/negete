@@ -206,17 +206,35 @@ export default function Contact({
                 setFieldErrors(errors);
                 if (Object.keys(errors).length > 0) return;
                 setIsSubmitting(true);
-                setTimeout(() => {
-                  setIsSubmitting(false);
-                  setSubmitStatus("success");
-                  setFormData({
-                    firstName: "",
-                    companyName: "",
-                    email: "",
-                    productDescription: "",
+                fetch("https://formspree.io/f/xpqjvyke", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    name: formData.firstName,
+                    company: formData.companyName,
+                    email: formData.email,
+                    message: formData.productDescription,
+                  }),
+                })
+                  .then((res) => {
+                    setIsSubmitting(false);
+                    if (res.ok) {
+                      setSubmitStatus("success");
+                      setFormData({
+                        firstName: "",
+                        companyName: "",
+                        email: "",
+                        productDescription: "",
+                      });
+                      setFieldErrors({});
+                    } else {
+                      setSubmitStatus("error");
+                    }
+                  })
+                  .catch(() => {
+                    setIsSubmitting(false);
+                    setSubmitStatus("error");
                   });
-                  setFieldErrors({});
-                }, 1000);
               }}>
               <div>
                 <label

@@ -79,29 +79,9 @@ export const project = defineType({
     defineField({
       name: "category",
       title: "Kategoria",
-      type: "string",
-      description: "Wybierz kategorię z listy lub wpisz własną",
-      options: {
-        list: [
-          { title: "Elektronika & PCB", value: "elektronika-pcb" },
-          { title: "Firmware & Embedded", value: "firmware-embedded" },
-          { title: "Mechanika & Wzornictwo", value: "mechanika-wzornictwo" },
-          { title: "IoT & Automatyka", value: "iot-automatyka" },
-          { title: "Medycyna & Sprzęt Medyczny", value: "medycyna" },
-          { title: "Motoryzacja", value: "motoryzacja" },
-          { title: "Wearables", value: "wearables" },
-          { title: "Inne", value: "inne" },
-        ],
-      },
-    }),
-    defineField({
-      name: "customCategory",
-      title: "Własna kategoria",
-      type: "string",
-      description: "Wpisz własną kategorię, jeśli nie ma jej na liście powyżej",
-      hidden: ({ parent }) => {
-        return parent?.category && parent.category !== "inne";
-      },
+      type: "reference",
+      to: [{ type: "projectCategory" }],
+      description: "Wybierz kategorię z listy. Kategoriami zarządzasz w sekcji 'Kategorie realizacji'.",
     }),
     defineField({
       name: "gridSpan",

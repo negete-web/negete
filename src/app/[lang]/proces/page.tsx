@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props) {
   return buildMetadata({
     title: processData?.heading ?? t(lang as Language, "proces.title"),
     description: processData?.intro,
-    image: processData?.heroImage?.url ?? settings?.defaultOgImage,
+    image: settings?.defaultOgImage,
     siteName: settings?.siteName,
     lang,
     path: `/${lang}/proces`,
