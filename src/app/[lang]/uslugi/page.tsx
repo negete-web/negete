@@ -15,6 +15,12 @@ const SERVICE_ICONS: Record<
   Award,
   Factory,
 };
+
+function getIconComponent(iconKey: string | null | undefined) {
+  if (!iconKey) return Cpu;
+  const normalized = iconKey.charAt(0).toUpperCase() + iconKey.slice(1).toLowerCase();
+  return SERVICE_ICONS[iconKey] ?? SERVICE_ICONS[normalized] ?? Cpu;
+}
 import {
   getCachedServicesSection,
   getCachedSiteSettings,
@@ -137,7 +143,7 @@ export default async function UslugiPage({ params }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {services.map((service, idx) => {
-            const IconComponent = SERVICE_ICONS[service.iconKey] || Cpu;
+            const IconComponent = getIconComponent(service.iconKey);
             return (
               <Link
                 key={idx}

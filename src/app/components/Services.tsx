@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Cpu, type LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import RocketSVG from "./RocketSVG";
 import {
   fetchServicesSection,
@@ -18,7 +17,12 @@ import { useLocalizedPath } from "@/hooks/useLocalizedPath";
 function getIcon(iconKey?: string): LucideIcon {
   if (!iconKey) return Cpu;
   const icon = (LucideIcons as Record<string, unknown>)[iconKey];
-  if (icon != null && typeof icon !== "string" && typeof icon !== "number" && typeof icon !== "boolean") {
+  if (
+    icon != null &&
+    typeof icon !== "string" &&
+    typeof icon !== "number" &&
+    typeof icon !== "boolean"
+  ) {
     return icon as LucideIcon;
   }
   return Cpu;
