@@ -145,14 +145,26 @@ export default function Contact({
                   )}
                 </motion.div>
               ))}
-              {contactItems && contactItems.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4 }}
-                  className="rounded-xl border-2 border-cyan-400/50 bg-white/5 shadow-lg shadow-cyan-500/10 p-5 flex flex-col gap-3">
-                  {contactItems.map((item, idx) => {
+              {(() => {
+                const cardItems =
+                  (contactItems?.length ?? 0) > 0
+                    ? contactItems!
+                    : data.people
+                        .filter((p) => p.email)
+                        .map((p) => ({
+                          icon: "Mail" as const,
+                          text: p.email!,
+                          url: `mailto:${p.email}`,
+                        }));
+                if (cardItems.length === 0) return null;
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4 }}
+                    className="rounded-xl border-2 border-cyan-400/50 bg-white/5 shadow-lg shadow-cyan-500/10 p-5 flex flex-col gap-3">
+                    {cardItems.map((item, idx) => {
                     const Icon = CONTACT_ICONS[item.icon] ?? Mail;
                     return (
                       <a
@@ -164,8 +176,9 @@ export default function Contact({
                       </a>
                     );
                   })}
-                </motion.div>
-              )}
+                  </motion.div>
+                );
+              })()}
             </motion.div>
           )}
 

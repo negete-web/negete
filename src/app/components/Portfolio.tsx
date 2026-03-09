@@ -43,15 +43,30 @@ export default function Portfolio({
     (p) => p.image && String(p.image).trim(),
   );
 
-  let items = projectsWithImages.map((p) => ({
+  const baseItems = projectsWithImages.map((p) => ({
     image: p.image,
     slug: p.slug,
     title: p.title,
   }));
 
-  while (items.length < 28) {
-    items = [...items, ...items];
+  if (baseItems.length === 0) return null;
+
+  const targetCount = 56;
+  const numCols = 4;
+  const numRows = Math.ceil(targetCount / numCols);
+  // Każda kolumna ma mix bez powtórzeń jedna pod drugą (round‑robin w kolumnie)
+  const columns: (typeof baseItems)[] = [[], [], [], []];
+  for (let c = 0; c < numCols; c++) {
+    let prevIndex = (c + baseItems.length - 1) % baseItems.length;
+    for (let r = 0; r < numRows; r++) {
+      const nextIndex = (prevIndex + 1) % baseItems.length;
+      columns[c].push(baseItems[nextIndex]);
+      prevIndex = nextIndex;
+    }
   }
+  const items = Array.from({ length: targetCount }, (_, i) =>
+    columns[i % numCols][Math.floor(i / numCols)],
+  );
 
   return (
     <section data-section="portfolio" className="relative md:py-32 py-12 px-6">

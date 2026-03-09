@@ -5,4 +5,5 @@ export const sanityClient = createClient({
   dataset: 'production',
   apiVersion: '2025-01-01',
   useCdn: false,
+  perspective: 'published', // tylko opublikowane dokumenty (bez draftów)
 });

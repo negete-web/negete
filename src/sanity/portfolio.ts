@@ -73,20 +73,21 @@ interface PortfolioSectionRaw {
 
 /**
  * Pobiera z Sanity dokument typu `portfolioSection` z tłumaczeniami.
- * Zakłada, że istnieje jeden główny dokument tej sekcji (bierze pierwszy z listy).
+ * Używane na stronie głównej – zwraca TYLKO projekty wybrane w sekcji Portfolio
+ * (pole "Wybrane projekty"), NIE listę wszystkich realizacji.
  * @param lang - Język, w którym mają być zwrócone dane ('pl' lub 'en')
  */
 export async function fetchPortfolioSection(
   lang: Language = "pl",
 ): Promise<PortfolioSection | null> {
   const query = `
-    *[_type == "portfolioSection"][0]{
+    *[_type == "portfolioSection"] | order(_updatedAt desc)[0]{
       _id,
       headingPl,
       headingEn,
       descriptionPl,
       descriptionEn,
-      projects[]->{
+      "projects": projects[]->[defined(_id)]{
         _id,
         titlePl,
         titleEn,

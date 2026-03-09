@@ -10,19 +10,37 @@ import {
 } from "@/sanity/process";
 import type { Language } from "@/i18n/config";
 import { t } from "@/i18n/dictionary";
-import {
-  ICONS,
-  PATH_D,
-  PATH_D_MOBILE,
-  IMG_TOPS,
-  CARD_TOPS,
-} from "./constants";
+import { ICONS, PATH_D, PATH_D_MOBILE, IMG_TOPS, CARD_TOPS } from "./constants";
 
 const FALLBACK_STEPS: ProcessSection[] = [
-  { id: 0, title: "Odkrywanie", description: "", color: "#06b6d4", details: [] },
-  { id: 1, title: "Projektowanie", description: "", color: "#06b6d4", details: [] },
-  { id: 2, title: "Prototypowanie", description: "", color: "#06b6d4", details: [] },
-  { id: 3, title: "Weryfikacja", description: "", color: "#06b6d4", details: [] },
+  {
+    id: 0,
+    title: "Odkrywanie",
+    description: "",
+    color: "#06b6d4",
+    details: [],
+  },
+  {
+    id: 1,
+    title: "Projektowanie",
+    description: "",
+    color: "#06b6d4",
+    details: [],
+  },
+  {
+    id: 2,
+    title: "Prototypowanie",
+    description: "",
+    color: "#06b6d4",
+    details: [],
+  },
+  {
+    id: 3,
+    title: "Weryfikacja",
+    description: "",
+    color: "#06b6d4",
+    details: [],
+  },
   { id: 4, title: "Wdrożenie", description: "", color: "#06b6d4", details: [] },
 ];
 import { ProcessHero } from "./ProcessHero";
@@ -390,7 +408,7 @@ export default function ProcessPage({
         )}
 
         {isMobile && (
-          <div className="relative w-full z-[2] px-4 flex flex-col gap-10 pt-24 pb-12">
+          <div className="relative w-full z-[2] px-4 flex flex-col gap-10 pt-16 pb-12">
             {sectionsToRender.map((section, index) => {
               const IconCmp = ICONS[section.icon ?? ""] ?? ICONS.Search;
               return (
@@ -401,7 +419,7 @@ export default function ProcessPage({
                     }}
                     data-section-color={section.color}
                     data-with-border={!!section.image?.withBorder}
-                    className={`relative -mb-20 z-20 w-44 aspect-square rounded-2xl overflow-hidden shrink-0 mt-3 ml-auto mr-4 ${
+                    className={`relative -mb-12 z-20 w-44 aspect-square rounded-2xl overflow-hidden shrink-0 -mt-1 ml-auto mr-4 ${
                       !section.image || section.image.withBorder
                         ? "border-2"
                         : ""
