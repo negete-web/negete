@@ -13,7 +13,6 @@ import type { Language } from "@/i18n/config";
 import { t } from "@/i18n/dictionary";
 import { ThreeDMarquee } from "./ui/3d-marquee";
 
-
 interface PortfolioProps {
   lang?: Language;
   initialData?: PortfolioSection | null;
@@ -47,6 +46,7 @@ export default function Portfolio({
     image: p.image,
     slug: p.slug,
     title: p.title,
+    isPortrait: p.isPortrait ?? false,
   }));
 
   if (baseItems.length === 0) return null;
@@ -64,8 +64,9 @@ export default function Portfolio({
       prevIndex = nextIndex;
     }
   }
-  const items = Array.from({ length: targetCount }, (_, i) =>
-    columns[i % numCols][Math.floor(i / numCols)],
+  const items = Array.from(
+    { length: targetCount },
+    (_, i) => columns[i % numCols][Math.floor(i / numCols)],
   );
 
   return (
@@ -82,7 +83,7 @@ export default function Portfolio({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}>
               {t(lang, "portfolio.seeMore")}
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 " />
             </motion.span>
           </Link>
         </div>

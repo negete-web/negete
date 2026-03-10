@@ -8,7 +8,9 @@ function getCategoryLabel(
   lang: Language = "pl",
 ): string | undefined {
   if (!category) return undefined;
-  return (lang === "en" ? category.titleEn : category.titlePl) || category.titlePl;
+  return (
+    (lang === "en" ? category.titleEn : category.titlePl) || category.titlePl
+  );
 }
 
 export interface Project {
@@ -17,6 +19,8 @@ export interface Project {
   slug: string;
   image: string;
   imageAlt?: string;
+  /** true gdy wysokość > szerokość (zdjęcie pionowe) – do obrotu w gridzie */
+  isPortrait?: boolean;
   gridSpan: string;
   description?: string;
   category?: string;
@@ -44,7 +48,11 @@ interface ProjectRaw {
   gridSpan?: string;
   descriptionPl?: string;
   descriptionEn?: string;
-  category?: { titlePl?: string; titleEn?: string; slug?: { current?: string } };
+  category?: {
+    titlePl?: string;
+    titleEn?: string;
+    slug?: { current?: string };
+  };
   sections?: any[];
   gallery?: Array<
     SanityImageSource & {
@@ -352,9 +360,7 @@ export async function fetchProjectBySlug(
     _id: data._id,
     title: data[titleKey] || data.titlePl || "",
     slug: data.slug?.current || "",
-    image: data.mainImage
-      ? urlFor(data.mainImage).width(1200).url()
-      : "",
+    image: data.mainImage ? urlFor(data.mainImage).width(1200).url() : "",
     imageAlt: data.mainImage?.[altKey] || data.mainImage?.altPl || "",
     gridSpan: data.gridSpan || "md:col-span-1 md:row-span-1",
     description: data[descriptionKey] || data.descriptionPl,

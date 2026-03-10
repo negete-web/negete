@@ -1,18 +1,65 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+const CELL_ASPECT_W = 970;
+const CELL_ASPECT_H = 700;
 
 export const ThreeDMarquee = ({
   items,
   getHref,
   className,
 }: {
-  items: { image: string; slug: string; title?: string }[];
+  items: {
+    image: string;
+    slug: string;
+    title?: string;
+    isPortrait?: boolean;
+  }[];
   getHref: (slug: string) => string;
   className?: string;
 }) => {
+  const [portraitByUrl, setPortraitByUrl] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  const uniqueUrlsKey = useMemo(
+    () =>
+      Array.from(new Set(items.map((i) => i.image).filter(Boolean)))
+        .sort()
+        .join("\0"),
+    [items],
+  );
+
+  useEffect(() => {
+    const urls = uniqueUrlsKey.split("\0").filter(Boolean);
+    if (urls.length === 0) return;
+
+    urls.forEach((url) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        if (w && h && h > w) {
+          setPortraitByUrl((prev) =>
+            prev[url] === true ? prev : { ...prev, [url]: true },
+          );
+        }
+      };
+      img.src = url;
+    });
+  }, [uniqueUrlsKey]);
+
+  const isPortrait = useCallback(
+    (item: (typeof items)[0]) => {
+      return item.isPortrait === true || portraitByUrl[item.image] === true;
+    },
+    [portraitByUrl],
+  );
+
   if (items.length === 0) return null;
 
   const chunks = Array.from({ length: 4 }, (_, colIndex) =>
@@ -44,27 +91,46 @@ export const ThreeDMarquee = ({
                 key={colIndex + "marquee"}
                 className="flex flex-col items-start gap-8">
                 <GridLineVertical className="-left-4" offset="80px" />
-                {subarray.map((item, imageIndex) => (
-                  <Link
-                    href={getHref(item.slug)}
-                    key={imageIndex + item.image}
-                    className="relative block">
-                    <GridLineHorizontal className="-top-4" offset="20px" />
-                    <motion.img
-                      whileHover={{ y: -10 }}
-                      transition={{
-                        duration: 0.3,
-                        ease: "easeInOut",
-                      }}
-                      src={item.image}
-                      alt={item.title || `Realizacja ${imageIndex + 1}`}
-                      className="aspect-[970/700] rounded-lg object-cover ring ring-gray-950/5 hover:shadow-2xl"
-                      width={970}
-                      height={700}
-                      referrerPolicy="no-referrer"
-                    />
-                  </Link>
-                ))}
+                {subarray.map((item, imageIndex) => {
+                  const portrait = isPortrait(item);
+                  return (
+                    <Link
+                      href={getHref(item.slug)}
+                      key={imageIndex + item.image + colIndex}
+                      className="relative block aspect-[970/700] w-full overflow-hidden rounded-lg border-2 border-transparent hover:border-blue-400 transition-colors">
+                      <GridLineHorizontal className="-top-4" offset="20px" />
+                      {portrait ? (
+                        <div
+                          className="absolute inset-0 flex items-center justify-center"
+                          style={{
+                            width: `${(CELL_ASPECT_H / CELL_ASPECT_W) * 100}%`,
+                            height: `${(CELL_ASPECT_W / CELL_ASPECT_H) * 100}%`,
+                            left: "50%",
+                            top: "50%",
+                            transform: "translate(-50%, -50%) rotate(90deg)",
+                          }}>
+                          <img
+                            src={item.image}
+                            alt={item.title || `Realizacja ${imageIndex + 1}`}
+                            className="h-full w-full rounded-lg object-cover"
+                            width={CELL_ASPECT_H}
+                            height={CELL_ASPECT_W}
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                      ) : (
+                        <img
+                          src={item.image}
+                          alt={item.title || `Realizacja ${imageIndex + 1}`}
+                          className="aspect-[970/700] rounded-lg object-cover"
+                          width={970}
+                          height={700}
+                          referrerPolicy="no-referrer"
+                        />
+                      )}
+                    </Link>
+                  );
+                })}
               </motion.div>
             ))}
           </div>

@@ -60,7 +60,7 @@ export default function ImageLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95"
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/95"
       style={{
         overflow: "hidden",
         overscrollBehavior: "none",
@@ -69,7 +69,7 @@ export default function ImageLightbox({
       onClick={onClose}>
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 rounded-full p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
+        className="absolute right-4 top-6 md:right-8 md:top-10 z-10 rounded-full p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
         aria-label={t(lang, "lightbox.close")}>
         <X className="h-8 w-8" />
       </button>
@@ -80,7 +80,7 @@ export default function ImageLightbox({
             e.stopPropagation();
             onPrev();
           }}
-          className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full p-3 text-white/80 transition hover:bg-white/10 hover:text-white"
+          className="absolute left-6 md:left-16 top-1/2 z-10 -translate-y-1/2 rounded-full p-3 text-white/80 transition hover:bg-white/10 hover:text-white"
           aria-label={t(lang, "lightbox.prev")}>
           <ChevronLeft className="h-10 w-10" />
         </button>
@@ -102,7 +102,7 @@ export default function ImageLightbox({
             e.stopPropagation();
             onNext();
           }}
-          className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full p-3 text-white/80 transition hover:bg-white/10 hover:text-white"
+          className="absolute right-6 md:right-16 top-1/2 z-10 -translate-y-1/2 rounded-full p-3 text-white/80 transition hover:bg-white/10 hover:text-white"
           aria-label={t(lang, "lightbox.next")}>
           <ChevronRight className="h-10 w-10" />
         </button>
