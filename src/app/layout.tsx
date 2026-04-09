@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { defaultLanguage, languages, type Language } from "@/i18n/config";
 import Aurora from "./components/Aurora";
@@ -71,6 +72,7 @@ export default async function RootLayout({
         </div>
 
         <AppShell>{children}</AppShell>
+        <Analytics />
       </body>
     </html>
   );
