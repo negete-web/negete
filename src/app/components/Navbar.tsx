@@ -4,6 +4,7 @@ import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import gsap from "gsap";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useLocalizedPath } from "@/hooks/useLocalizedPath";
 import { t } from "@/i18n/dictionary";
@@ -124,10 +125,13 @@ export default function Navbar() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Link href={getPath("/")} className="flex items-center">
-                <img
+                <Image
                   src="/negete_logo.png"
                   alt="NEGETE Logo"
-                  className="h-12"
+                  width={120}
+                  height={48}
+                  className="h-12 w-auto"
+                  priority
                 />
               </Link>
             </div>

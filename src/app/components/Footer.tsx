@@ -13,8 +13,8 @@ import {
   Youtube,
 } from "lucide-react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
+import Image from "next/image";
 import { useLocalizedPath } from "@/hooks/useLocalizedPath";
 import { fetchFooterData } from "@/sanity/footer";
 import { fetchServicesSection } from "@/sanity/services";
@@ -186,10 +186,12 @@ export default function Footer() {
             }}
             className="space-y-4">
             <Link href={getPath("/")} className="inline-block">
-              <img
+              <Image
                 src="/negete_logo.png"
                 alt="NEGETE Logo"
-                className="h-12 mb-4"
+                width={120}
+                height={48}
+                className="h-12 w-auto mb-4"
               />
             </Link>
             {footerDescription && (

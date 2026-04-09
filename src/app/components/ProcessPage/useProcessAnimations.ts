@@ -29,7 +29,6 @@ export function useProcessAnimations(
     pathMobileRef,
     svgSectionRef,
     cardRefs,
-    imgRefs,
     heroTitleRef,
     heroIntroRef,
     heroLineRef,

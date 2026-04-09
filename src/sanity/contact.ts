@@ -1,4 +1,5 @@
 import { sanityClient } from "./client";
+import { localized } from "./i18n";
 import { type Language } from "@/i18n/config";
 
 export interface ContactPerson {
@@ -59,51 +60,33 @@ export async function fetchContactSection(
     }
   `;
 
-  const data = await sanityClient.fetch<any>(query);
+  const data = await sanityClient.fetch<Record<string, unknown> | null>(query);
+  if (!data) return null;
 
-  if (!data) {
-    return null;
-  }
+  const l = (field: string) => localized(data, field, lang);
 
-  const headingKey = lang === "pl" ? "headingPl" : "headingEn";
-  const nameLabelKey = lang === "pl" ? "nameLabelPl" : "nameLabelEn";
-  const companyLabelKey = lang === "pl" ? "companyLabelPl" : "companyLabelEn";
-  const messageLabelKey = lang === "pl" ? "messageLabelPl" : "messageLabelEn";
-  const submitKey = lang === "pl" ? "submitButtonPl" : "submitButtonEn";
-  const successKey = lang === "pl" ? "successMessagePl" : "successMessageEn";
-  const errorKey = lang === "pl" ? "errorMessagePl" : "errorMessageEn";
-  const requiredKey = lang === "pl" ? "requiredErrorPl" : "requiredErrorEn";
-  const invalidEmailKey = lang === "pl" ? "invalidEmailPl" : "invalidEmailEn";
-
-  const people: ContactPerson[] = (data.people || []).map((p: any) => {
-    const nameKey = lang === "pl" ? "namePl" : "nameEn";
-    const roleKey = lang === "pl" ? "rolePl" : "roleEn";
-    const bioKey = lang === "pl" ? "bioPl" : "bioEn";
-    return {
-      name: p[nameKey] || p.namePl || "",
-      role: p[roleKey] || p.rolePl,
-      email: p.email,
-      bio: p[bioKey] || p.bioPl,
-    };
-  });
+  const people: ContactPerson[] = ((data.people as Record<string, unknown>[]) || []).map((p) => ({
+    name: localized(p, "name", lang),
+    role: localized(p, "role", lang) || undefined,
+    email: p.email as string | undefined,
+    bio: localized(p, "bio", lang) || undefined,
+  }));
 
   return {
-    heading: data[headingKey] || data.headingPl || "Kontakt",
-    subtitle: data[lang === "pl" ? "subtitlePl" : "subtitleEn"] || data.subtitlePl,
+    heading: l("heading") || "Kontakt",
+    subtitle: localized(data, "subtitle", lang) || undefined,
     people,
-    nameLabel: data[nameLabelKey] || data.nameLabelPl || "Imię",
-    companyLabel: data[companyLabelKey] || data.companyLabelPl || "Nazwa firmy",
-    messageLabel: data[messageLabelKey] || data.messageLabelPl || "",
-    submitButton: data[submitKey] || data.submitButtonPl || "Wyślij wiadomość",
+    nameLabel: l("nameLabel") || "Imię",
+    companyLabel: l("companyLabel") || "Nazwa firmy",
+    messageLabel: l("messageLabel") || "",
+    submitButton: l("submitButton") || "Wyślij wiadomość",
     successMessage:
-      data[successKey] ||
-      data.successMessagePl ||
+      l("successMessage") ||
       "Dziękujemy! Twoja wiadomość została wysłana. Skontaktujemy się z Tobą wkrótce.",
     errorMessage:
-      data[errorKey] ||
-      data.errorMessagePl ||
+      l("errorMessage") ||
       "Wystąpił błąd. Spróbuj ponownie lub skontaktuj się bezpośrednio przez email.",
-    requiredError: data[requiredKey] || data.requiredErrorPl || "To pole jest wymagane",
-    invalidEmail: data[invalidEmailKey] || data.invalidEmailPl || "Podaj prawidłowy adres email",
+    requiredError: l("requiredError") || "To pole jest wymagane",
+    invalidEmail: l("invalidEmail") || "Podaj prawidłowy adres email",
   };
 }

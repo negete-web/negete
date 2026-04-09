@@ -1,11 +1,8 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
-
 interface ProcessHeroProps {
   heading: string;
   intro: string;
-  stepsHint?: string;
   heroTitleRef: React.RefObject<HTMLHeadingElement | null>;
   heroIntroRef: React.RefObject<HTMLParagraphElement | null>;
   heroLineRef: React.RefObject<HTMLDivElement | null>;
@@ -14,7 +11,6 @@ interface ProcessHeroProps {
 export function ProcessHero({
   heading,
   intro,
-  stepsHint,
   heroTitleRef,
   heroIntroRef,
   heroLineRef,

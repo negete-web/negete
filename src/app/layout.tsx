@@ -6,7 +6,6 @@ import { defaultLanguage, languages, type Language } from "@/i18n/config";
 import Aurora from "./components/Aurora";
 import AppShell from "./components/AppShell";
 import { OrganizationJsonLd, WebSiteJsonLd } from "./components/JsonLd";
-import SmoothScrollLayout from "./components/SmoothScrollLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Send, User, Building, MessageSquare } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
@@ -12,18 +12,32 @@ import { usePathname } from "next/navigation";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
-const CONTACT_ICONS: Record<string, React.ComponentType<any>> = {
+const CONTACT_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Mail,
   Phone,
   MapPin,
+};
+
+type FormData = {
+  firstName: string;
+  companyName: string;
+  email: string;
+  productDescription: string;
+};
+
+type FieldErrors = Partial<Record<"firstName" | "email" | "productDescription", string>>;
+
+const INITIAL_FORM: FormData = {
+  firstName: "",
+  companyName: "",
+  email: "",
+  productDescription: "",
 };
 
 interface ContactProps {
   lang?: Language;
   initialData?: ContactSection | null;
   contactItems?: FooterContactItem[];
-  /** Na stronie /kontakt użyj H1 zamiast H2 */
   headingLevel?: "h1" | "h2";
 }
 
@@ -37,40 +51,35 @@ export default function Contact({
   const [contactData, setContactData] = useState<ContactSection | null>(
     initialDataProp ?? null,
   );
-  const [formData, setFormData] = useState({
-    firstName: "",
-    companyName: "",
-    email: "",
-    productDescription: "",
-  });
-  const [fieldErrors, setFieldErrors] = useState<{
-    firstName?: string;
-    email?: string;
-    productDescription?: string;
-  }>({});
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
-  const clearFieldError = (field: keyof typeof fieldErrors) => {
-    setFieldErrors((p) => {
-      const next = { ...p };
-      delete next[field];
-      return next;
-    });
-  };
-
-  const getLang = (): Language => {
+  const lang = (() => {
     if (langProp) return langProp;
     const segments = pathname?.split("/").filter(Boolean);
-    if (segments.length > 0 && languages.includes(segments[0] as Language)) {
+    if (segments && segments.length > 0 && languages.includes(segments[0] as Language)) {
       return segments[0] as Language;
     }
     return "pl";
-  };
+  })();
 
-  const lang = getLang();
+  const clearFieldError = useCallback((field: keyof FieldErrors) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }, []);
+
+  const updateField = useCallback((field: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field in INITIAL_FORM && field !== "companyName") {
+      clearFieldError(field as keyof FieldErrors);
+    }
+  }, [clearFieldError]);
 
   useEffect(() => {
     if (initialDataProp) return;
@@ -79,9 +88,69 @@ export default function Contact({
       .catch((err) => console.error("Błąd pobierania sekcji kontakt:", err));
   }, [lang, initialDataProp]);
 
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactData) return;
+
+    setSubmitStatus("idle");
+
+    const errors: FieldErrors = {};
+    if (!formData.firstName.trim()) errors.firstName = contactData.requiredError;
+    if (!formData.email.trim()) {
+      errors.email = contactData.requiredError;
+    } else if (!EMAIL_REGEX.test(formData.email)) {
+      errors.email = contactData.invalidEmail;
+    }
+    if (!formData.productDescription.trim()) errors.productDescription = contactData.requiredError;
+
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("https://formspree.io/f/xpqjvyke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.firstName,
+          company: formData.companyName,
+          email: formData.email,
+          message: formData.productDescription,
+        }),
+      });
+      setSubmitStatus(res.ok ? "success" : "error");
+      if (res.ok) {
+        setFormData(INITIAL_FORM);
+        setFieldErrors({});
+      }
+    } catch {
+      setSubmitStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [contactData, formData]);
+
   if (!contactData) return null;
 
   const data = contactData;
+  const Heading = headingLevel;
+
+  const cardItems = contactItems?.length
+    ? contactItems
+    : data.people
+        .filter((p) => p.email)
+        .map((p) => ({
+          icon: "Mail" as const,
+          text: p.email!,
+          url: `mailto:${p.email}`,
+        }));
+
+  const inputClassName = (field: keyof FieldErrors) =>
+    `w-full px-4 py-3 bg-black/30 border rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 ${
+      fieldErrors[field]
+        ? "border-red-400/50"
+        : "border-white/10 focus:border-cyan-400/50"
+    }`;
 
   return (
     <section
@@ -94,22 +163,16 @@ export default function Contact({
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-center mb-12">
-          {headingLevel === "h1" ? (
-            <h1 className="text-3xl sm:text-4xl font-medium text-white mb-4">
-              {data.heading}
-            </h1>
-          ) : (
-            <h2 className="text-3xl sm:text-4xl font-medium text-white mb-4">
-              {data.heading}
-            </h2>
-          )}
+          <Heading className="text-3xl sm:text-4xl font-medium text-white mb-4">
+            {data.heading}
+          </Heading>
           {data.subtitle && (
             <p className="text-gray-400 text-lg">{data.subtitle}</p>
           )}
         </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-14 items-stretch lg:items-start justify-center">
-          {(data.people.length > 0 || (contactItems && contactItems.length > 0)) && (
+          {(data.people.length > 0 || cardItems.length > 0) && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -145,26 +208,14 @@ export default function Contact({
                   )}
                 </motion.div>
               ))}
-              {(() => {
-                const cardItems =
-                  (contactItems?.length ?? 0) > 0
-                    ? contactItems!
-                    : data.people
-                        .filter((p) => p.email)
-                        .map((p) => ({
-                          icon: "Mail" as const,
-                          text: p.email!,
-                          url: `mailto:${p.email}`,
-                        }));
-                if (cardItems.length === 0) return null;
-                return (
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4 }}
-                    className="rounded-xl border-2 border-cyan-400/50 bg-white/5 shadow-lg shadow-cyan-500/10 p-5 flex flex-col gap-3">
-                    {cardItems.map((item, idx) => {
+              {cardItems.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4 }}
+                  className="rounded-xl border-2 border-cyan-400/50 bg-white/5 shadow-lg shadow-cyan-500/10 p-5 flex flex-col gap-3">
+                  {cardItems.map((item, idx) => {
                     const Icon = CONTACT_ICONS[item.icon] ?? Mail;
                     return (
                       <a
@@ -176,9 +227,8 @@ export default function Contact({
                       </a>
                     );
                   })}
-                  </motion.div>
-                );
-              })()}
+                </motion.div>
+              )}
             </motion.div>
           )}
 
@@ -190,54 +240,7 @@ export default function Contact({
             className="w-full max-w-md shrink-0 flex flex-col gap-6">
             <form
               className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 space-y-5"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSubmitStatus("idle");
-                const errors: typeof fieldErrors = {};
-                if (!formData.firstName.trim()) {
-                  errors.firstName = data.requiredError;
-                }
-                if (!formData.email.trim()) {
-                  errors.email = data.requiredError;
-                } else if (!EMAIL_REGEX.test(formData.email)) {
-                  errors.email = data.invalidEmail;
-                }
-                if (!formData.productDescription.trim()) {
-                  errors.productDescription = data.requiredError;
-                }
-                setFieldErrors(errors);
-                if (Object.keys(errors).length > 0) return;
-                setIsSubmitting(true);
-                fetch("https://formspree.io/f/xpqjvyke", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    name: formData.firstName,
-                    company: formData.companyName,
-                    email: formData.email,
-                    message: formData.productDescription,
-                  }),
-                })
-                  .then((res) => {
-                    setIsSubmitting(false);
-                    if (res.ok) {
-                      setSubmitStatus("success");
-                      setFormData({
-                        firstName: "",
-                        companyName: "",
-                        email: "",
-                        productDescription: "",
-                      });
-                      setFieldErrors({});
-                    } else {
-                      setSubmitStatus("error");
-                    }
-                  })
-                  .catch(() => {
-                    setIsSubmitting(false);
-                    setSubmitStatus("error");
-                  });
-              }}>
+              onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="firstName"
@@ -250,28 +253,16 @@ export default function Contact({
                   id="firstName"
                   name="firstName"
                   value={formData.firstName}
-                  onChange={(e) => {
-                    setFormData((p) => ({ ...p, firstName: e.target.value }));
-                    clearFieldError("firstName");
-                  }}
+                  onChange={(e) => updateField("firstName", e.target.value)}
                   required
                   aria-required="true"
                   aria-invalid={!!fieldErrors.firstName}
-                  aria-describedby={
-                    fieldErrors.firstName ? "firstName-error" : undefined
-                  }
-                  className={`w-full px-4 py-3 bg-black/30 border rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 ${
-                    fieldErrors.firstName
-                      ? "border-red-400/50"
-                      : "border-white/10 focus:border-cyan-400/50"
-                  }`}
+                  aria-describedby={fieldErrors.firstName ? "firstName-error" : undefined}
+                  className={inputClassName("firstName")}
                   placeholder="Jan"
                 />
                 {fieldErrors.firstName && (
-                  <p
-                    id="firstName-error"
-                    className="mt-2 text-sm text-red-400"
-                    role="alert">
+                  <p id="firstName-error" className="mt-2 text-sm text-red-400" role="alert">
                     {fieldErrors.firstName}
                   </p>
                 )}
@@ -289,9 +280,7 @@ export default function Contact({
                   id="companyName"
                   name="companyName"
                   value={formData.companyName}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, companyName: e.target.value }))
-                  }
+                  onChange={(e) => updateField("companyName", e.target.value)}
                   className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
                   placeholder="Twoja firma"
                 />
@@ -309,28 +298,16 @@ export default function Contact({
                   id="email"
                   name="email"
                   value={formData.email}
-                  onChange={(e) => {
-                    setFormData((p) => ({ ...p, email: e.target.value }));
-                    clearFieldError("email");
-                  }}
+                  onChange={(e) => updateField("email", e.target.value)}
                   required
                   aria-required="true"
                   aria-invalid={!!fieldErrors.email}
-                  aria-describedby={
-                    fieldErrors.email ? "email-error" : undefined
-                  }
-                  className={`w-full px-4 py-3 bg-black/30 border rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 ${
-                    fieldErrors.email
-                      ? "border-red-400/50"
-                      : "border-white/10 focus:border-cyan-400/50"
-                  }`}
+                  aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                  className={inputClassName("email")}
                   placeholder="jan@example.com"
                 />
                 {fieldErrors.email && (
-                  <p
-                    id="email-error"
-                    className="mt-2 text-sm text-red-400"
-                    role="alert">
+                  <p id="email-error" className="mt-2 text-sm text-red-400" role="alert">
                     {fieldErrors.email}
                   </p>
                 )}
@@ -347,27 +324,15 @@ export default function Contact({
                   id="productDescription"
                   name="productDescription"
                   value={formData.productDescription}
-                  onChange={(e) => {
-                    setFormData((p) => ({
-                      ...p,
-                      productDescription: e.target.value,
-                    }));
-                    clearFieldError("productDescription");
-                  }}
+                  onChange={(e) => updateField("productDescription", e.target.value)}
                   required
                   aria-required="true"
                   aria-invalid={!!fieldErrors.productDescription}
                   aria-describedby={
-                    fieldErrors.productDescription
-                      ? "productDescription-error"
-                      : undefined
+                    fieldErrors.productDescription ? "productDescription-error" : undefined
                   }
                   rows={6}
-                  className={`w-full px-4 py-3 bg-black/30 border rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 resize-none ${
-                    fieldErrors.productDescription
-                      ? "border-red-400/50"
-                      : "border-white/10 focus:border-cyan-400/50"
-                  }`}
+                  className={`${inputClassName("productDescription")} resize-none`}
                   placeholder="Opisz swoją wizję produktu..."
                 />
                 {fieldErrors.productDescription && (

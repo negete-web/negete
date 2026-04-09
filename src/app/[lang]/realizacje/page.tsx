@@ -3,7 +3,7 @@ import { type Language, languages } from "@/i18n/config";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Badge } from "../../components/ui/badge";
+import { Badge } from "@/app/components/ui/badge";
 import Footer from "../../components/Footer";
 import { buildMetadata } from "@/lib/metadata";
 import { t } from "@/i18n/dictionary";
@@ -124,11 +124,13 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
                           </Badge>
                         </div>
                       )}
-                      <div className=" max-h-[250px] h-full  flex items-center justify-center">
-                        <img
+                      <div className="max-h-[250px] h-full flex items-center justify-center">
+                        <Image
                           src={project.image}
                           alt={project.imageAlt || project.title}
-                          className=" object-contain  h-full  rounded-xl"
+                          width={400}
+                          height={250}
+                          className="object-contain h-full rounded-xl"
                         />
                       </div>
                     </div>

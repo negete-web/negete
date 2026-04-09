@@ -4,77 +4,68 @@ import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-interface RocketSVGProps {
-  sectionId?: string;
+const INITIAL_STATE = {
+  x: 0,
+  xPercent: -50,
+  opacity: 0,
+  scale: 0.8,
+  visibility: "hidden" as const,
+};
+
+const HIDE_ANIM = {
+  y: -300,
+  opacity: 0,
+  scale: 0.8,
+  duration: 1.2,
+  ease: "power2.in",
+  force3D: true,
+};
+
+function animateTargets(
+  targets: (SVGSVGElement | HTMLDivElement | null)[],
+  props: gsap.TweenVars,
+) {
+  targets.forEach((el) => {
+    if (!el) return;
+    gsap.killTweensOf(el);
+    gsap.to(el, props);
+  });
 }
 
-export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
+function setTargets(
+  targets: (SVGSVGElement | HTMLDivElement | null)[],
+  props: gsap.TweenVars,
+) {
+  targets.forEach((el) => el && gsap.set(el, props));
+}
+
+export default function RocketSVG() {
   const rocketRef = useRef<SVGSVGElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!rocketRef.current) return;
 
     const ctx = gsap.context(() => {
-      const servicesSection = document.querySelector(
-        '[data-section="services"]',
-      );
-      const trustedBySection = document.querySelector(
-        '[data-section="trustedby"]',
-      );
-
+      const servicesSection = document.querySelector('[data-section="services"]');
+      const trustedBySection = document.querySelector('[data-section="trustedby"]');
       if (!servicesSection || !trustedBySection) return;
 
-      if (rocketRef.current) {
-        gsap.set(rocketRef.current, {
-          y: window.innerHeight + 500,
-          x: 0,
-          xPercent: -50,
-          opacity: 0,
-          scale: 0.8,
-          visibility: "hidden",
-        });
-      }
-      if (glowRef.current) {
-        gsap.set(glowRef.current, {
-          y: window.innerHeight + 500,
-          x: 0,
-          xPercent: -50,
-          opacity: 0,
-          scale: 0.8,
-          visibility: "hidden",
-        });
-      }
+      const targets = [rocketRef.current, glowRef.current];
 
-      const animateRocketIn = () => {
-        if (!rocketRef.current) return;
+      setTargets(targets, {
+        ...INITIAL_STATE,
+        y: window.innerHeight + 500,
+      });
 
-        gsap.killTweensOf(rocketRef.current);
-        if (glowRef.current) {
-          gsap.killTweensOf(glowRef.current);
-        }
-
-        gsap.set(rocketRef.current, {
+      const animateIn = () => {
+        setTargets(targets, {
+          ...INITIAL_STATE,
           y: window.innerHeight + 500,
-          x: 0,
-          xPercent: -50,
-          opacity: 0,
-          scale: 0.8,
           visibility: "visible",
         });
-        if (glowRef.current) {
-          gsap.set(glowRef.current, {
-            y: window.innerHeight + 500,
-            x: 0,
-            xPercent: -50,
-            opacity: 0,
-            scale: 0.8,
-            visibility: "visible",
-          });
-        }
 
-        gsap.to(rocketRef.current, {
+        const showProps: gsap.TweenVars = {
           y: 120,
           x: 0,
           xPercent: -50,
@@ -84,131 +75,48 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
           duration: 1.2,
           ease: "power2.out",
           force3D: true,
-          onComplete: () => {
-            if (rocketRef.current) {
-              gsap.to(rocketRef.current, {
+        };
+
+        if (rocketRef.current) {
+          gsap.killTweensOf(rocketRef.current);
+          gsap.to(rocketRef.current, {
+            ...showProps,
+            onComplete: () => {
+              const floatProps: gsap.TweenVars = {
                 y: 100,
                 duration: 1.5,
                 ease: "sine.inOut",
                 yoyo: true,
                 repeat: -1,
                 force3D: true,
-              });
-            }
-            if (glowRef.current) {
-              gsap.to(glowRef.current, {
-                y: 100,
-                duration: 1.5,
-                ease: "sine.inOut",
-                yoyo: true,
-                repeat: -1,
-                force3D: true,
-              });
-            }
-          },
-        });
-        if (glowRef.current) {
-          gsap.to(glowRef.current, {
-            y: 120,
-            x: 0,
-            xPercent: -50,
-            opacity: 1,
-            scale: 0.85,
-            visibility: "visible",
-            duration: 1.2,
-            ease: "power2.out",
-            force3D: true,
+              };
+              targets.forEach((el) => el && gsap.to(el, floatProps));
+            },
           });
         }
+
+        if (glowRef.current) {
+          gsap.killTweensOf(glowRef.current);
+          gsap.to(glowRef.current, showProps);
+        }
       };
+
+      const animateOut = () => animateTargets(targets, HIDE_ANIM);
 
       ScrollTrigger.create({
         trigger: servicesSection,
         start: "top 50%",
         end: "bottom 20%",
-        onEnter: () => {
-          animateRocketIn();
-        },
-        onEnterBack: () => {
-          animateRocketIn();
-        },
-        onLeave: () => {
-          if (rocketRef.current) {
-            gsap.killTweensOf(rocketRef.current);
-            gsap.to(rocketRef.current, {
-              y: -300,
-              opacity: 0,
-              scale: 0.8,
-              duration: 1.2,
-              ease: "power2.in",
-              force3D: true,
-            });
-          }
-          if (glowRef.current) {
-            gsap.killTweensOf(glowRef.current);
-            gsap.to(glowRef.current, {
-              y: -300,
-              opacity: 0,
-              scale: 0.8,
-              duration: 1.2,
-              ease: "power2.in",
-              force3D: true,
-            });
-          }
-        },
-        onLeaveBack: () => {
-          if (rocketRef.current) {
-            gsap.killTweensOf(rocketRef.current);
-            gsap.to(rocketRef.current, {
-              y: -300,
-              opacity: 0,
-              scale: 0.8,
-              duration: 1.2,
-              ease: "power2.in",
-              force3D: true,
-            });
-          }
-          if (glowRef.current) {
-            gsap.killTweensOf(glowRef.current);
-            gsap.to(glowRef.current, {
-              y: -300,
-              opacity: 0,
-              scale: 0.8,
-              duration: 1.2,
-              ease: "power2.in",
-              force3D: true,
-            });
-          }
-        },
+        onEnter: animateIn,
+        onEnterBack: animateIn,
+        onLeave: animateOut,
+        onLeaveBack: animateOut,
       });
 
       ScrollTrigger.create({
         trigger: trustedBySection,
         start: "top 20%",
-        onEnter: () => {
-          if (rocketRef.current) {
-            gsap.killTweensOf(rocketRef.current);
-            gsap.to(rocketRef.current, {
-              y: -300,
-              opacity: 0,
-              scale: 0.8,
-              duration: 1.2,
-              ease: "power2.in",
-              force3D: true,
-            });
-          }
-          if (glowRef.current) {
-            gsap.killTweensOf(glowRef.current);
-            gsap.to(glowRef.current, {
-              y: -300,
-              opacity: 0,
-              scale: 0.8,
-              duration: 1.2,
-              ease: "power2.in",
-              force3D: true,
-            });
-          }
-        },
+        onEnter: animateOut,
       });
     });
 
@@ -216,9 +124,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
+    <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
       <svg
         ref={rocketRef}
         viewBox="0 0 511.001 511.001"
@@ -252,12 +158,7 @@ export default function RocketSVG({ sectionId = "services" }: RocketSVGProps) {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <filter
-            id="neonGlowStrong"
-            x="-100%"
-            y="-100%"
-            width="300%"
-            height="300%">
+          <filter id="neonGlowStrong" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="8" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />

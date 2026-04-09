@@ -1,4 +1,5 @@
 import { sanityClient } from "./client";
+import { localized } from "./i18n";
 import type { Language } from "@/i18n/config";
 
 export interface FooterContactItem {
@@ -38,32 +39,29 @@ export async function fetchFooterData(
         }
       }
     `;
-    const data = await sanityClient.fetch<any | null>(
+    const data = await sanityClient.fetch<Record<string, unknown> | null>(
       query,
       {},
       { useCdn: false },
     );
     if (!data) return null;
 
-    const descKey =
-      lang === "pl" ? "footerDescriptionPl" : "footerDescriptionEn";
-    const description = data[descKey] || data.footerDescriptionPl || "";
+    const description = localized(data, "footerDescription", lang);
 
-    const textKey = lang === "pl" ? "textPl" : "textEn";
     const contactItems: FooterContactItem[] = (
-      data.footerContactItems || []
-    ).map((item: any) => ({
-      icon: item.icon || "Mail",
-      text: item[textKey] || item.textPl || "",
-      url: item.url || "#",
+      (data.footerContactItems as Record<string, unknown>[]) || []
+    ).map((item) => ({
+      icon: (item.icon as FooterContactItem["icon"]) || "Mail",
+      text: localized(item, "text", lang),
+      url: (item.url as string) || "#",
     }));
 
-    const socialLinks: FooterSocialItem[] = (data.footerSocialLinks || []).map(
-      (item: any) => ({
-        icon: item.icon || "Linkedin",
-        url: item.url || "#",
-      }),
-    );
+    const socialLinks: FooterSocialItem[] = (
+      (data.footerSocialLinks as Record<string, unknown>[]) || []
+    ).map((item) => ({
+      icon: (item.icon as string) || "Linkedin",
+      url: (item.url as string) || "#",
+    }));
 
     return { description, contactItems, socialLinks };
   } catch (error) {

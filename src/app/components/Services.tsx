@@ -11,7 +11,6 @@ import {
 } from "@/sanity/services";
 import type { Language } from "@/i18n/config";
 import { useLocalizedPath } from "@/hooks/useLocalizedPath";
-import { getServiceIcon } from "@/lib/lucide-service-icons";
 import LucideDynamicIcon from "@/components/LucideDynamicIcon";
 
 interface ServicesProps {
@@ -153,10 +152,10 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
     <section
       ref={sectionRef}
       data-section="services"
-      className="relative max-w-7xl mx-auto md:py-32 pb-12 px-6 ">
-      <div className="">
+      className="relative max-w-7xl mx-auto md:py-32 pb-12 px-6">
+      <div>
         <div className="flex flex-col max-w-6xl gap-4 items-start">
-          <div className=" relative z-10">
+          <div className="relative z-10">
             <div ref={leftTextRef} className="space-y-6 opacity-0">
               <h2
                 ref={titleRef}
@@ -174,8 +173,8 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
           </div>
         </div>
       </div>
-      <div className="hidden    lg:block absolute  inset-x-0 pointer-events-none z-0">
-        <RocketSVG sectionId="services" />
+      <div className="hidden lg:block absolute inset-x-0 pointer-events-none z-0">
+        <RocketSVG />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -184,7 +183,6 @@ export default function Services({ lang = "pl", initialData }: ServicesProps) {
             const rightService = rightServices[rowIndex];
 
             const renderCard = (service: ServiceItem) => {
-              const Icon = getServiceIcon(service.iconKey);
               const slug = service.slug ?? undefined;
               const href = getPath(slug ? `/uslugi/${slug}` : "/uslugi");
               return (

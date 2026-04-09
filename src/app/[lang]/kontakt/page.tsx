@@ -15,10 +15,9 @@ type Props = {
 export async function generateMetadata({ params }: Props) {
   const { lang } = await params;
   if (!languages.includes(lang as Language)) return {};
-  const [settings, contactData, footerData] = await Promise.all([
+  const [settings, contactData] = await Promise.all([
     getCachedSiteSettings(lang as Language),
     getCachedContactSection(lang as Language),
-    getCachedFooterData(lang as Language),
   ]);
   const seo = settings?.contactPageSeo;
   return buildMetadata({

@@ -9,7 +9,6 @@ import {
   type ProcessSection,
 } from "@/sanity/process";
 import type { Language } from "@/i18n/config";
-import { t } from "@/i18n/dictionary";
 import { ICONS, PATH_D, PATH_D_MOBILE, IMG_TOPS, CARD_TOPS } from "./constants";
 
 const FALLBACK_STEPS: ProcessSection[] = [
@@ -124,7 +123,6 @@ export default function ProcessPage({
       <ProcessHero
         heading={heading}
         intro={intro}
-        stepsHint={t(lang, "proces.stepsHint")}
         heroTitleRef={heroTitleRef}
         heroIntroRef={heroIntroRef}
         heroLineRef={heroLineRef}
