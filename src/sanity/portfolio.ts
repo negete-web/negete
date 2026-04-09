@@ -95,7 +95,7 @@ export async function fetchPortfolioSection(
       headingEn,
       descriptionPl,
       descriptionEn,
-      "projects": projects[]->[defined(_id)]{
+      "projects": projects[]->{
         _id,
         titlePl,
         titleEn,
@@ -109,7 +109,7 @@ export async function fetchPortfolioSection(
         descriptionPl,
         descriptionEn,
         category->{ titlePl, titleEn, slug }
-      }
+      }[defined(_id) && !(_id in path("drafts.**"))]
     }
   `;
 
@@ -180,7 +180,7 @@ export async function fetchProjectBySlug(
   lang: Language = "pl",
 ): Promise<ProjectDetail | null> {
   const query = `
-    *[_type == "project" && slug.current == $slug][0]{
+    *[_type == "project" && slug.current == $slug && !(_id in path("drafts.**"))][0]{
       _id,
       titlePl,
       titleEn,
@@ -381,7 +381,7 @@ export async function fetchAllProjects(
   lang: Language = "pl",
 ): Promise<Project[]> {
   const query = `
-    *[_type == "project"] | order(publishedAt desc){
+    *[_type == "project" && !(_id in path("drafts.**"))] | order(publishedAt desc){
       _id,
       titlePl,
       titleEn,
