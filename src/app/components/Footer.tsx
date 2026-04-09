@@ -20,6 +20,7 @@ import { fetchFooterData } from "@/sanity/footer";
 import { fetchServicesSection } from "@/sanity/services";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { t } from "@/i18n/dictionary";
+import type { Language } from "@/i18n/config";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Mail,
@@ -33,28 +34,42 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Youtube,
 };
 
-export default function Footer() {
+interface FooterProps {
+  lang?: Language;
+  initialFooterData?: Awaited<ReturnType<typeof fetchFooterData>>;
+  initialServicesData?: Awaited<ReturnType<typeof fetchServicesSection>>;
+}
+
+export default function Footer({
+  lang: langProp,
+  initialFooterData = null,
+  initialServicesData = null,
+}: FooterProps) {
   const footerRef = useRef<HTMLElement>(null);
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const { lang, getPath } = useLocalizedPath();
+  const { lang, getPath } = useLocalizedPath(langProp);
   const [footerData, setFooterData] =
-    useState<Awaited<ReturnType<typeof fetchFooterData>>>(null);
+    useState<Awaited<ReturnType<typeof fetchFooterData>>>(initialFooterData);
   const [servicesData, setServicesData] =
-    useState<Awaited<ReturnType<typeof fetchServicesSection>>>(null);
+    useState<Awaited<ReturnType<typeof fetchServicesSection>>>(initialServicesData);
   const [faqItems, setFaqItems] = useState<{ id: number; question: string }[]>(
     [],
   );
 
   useEffect(() => {
-    fetchFooterData(lang).then((data) => setFooterData(data));
-    fetchServicesSection(lang).then((data) => setServicesData(data));
+    if (!initialFooterData) {
+      fetchFooterData(lang).then((data) => setFooterData(data));
+    }
+    if (!initialServicesData) {
+      fetchServicesSection(lang).then((data) => setServicesData(data));
+    }
     fetch(`/api/faq?lang=${lang}`)
       .then((res) => res.json())
       .then((data: { items?: { id: number; question: string }[] }) =>
         setFaqItems(data.items ?? []),
       )
       .catch(() => setFaqItems([]));
-  }, [lang]);
+  }, [lang, initialFooterData, initialServicesData]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {

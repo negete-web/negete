@@ -11,6 +11,11 @@ import {
   getCachedSiteSettings,
   getCachedPortfolioSection,
   getCachedStatsSection,
+  getCachedServicesSection,
+  getCachedHomepageProcess,
+  getCachedTrustedBy,
+  getCachedContactSection,
+  getCachedFooterData,
 } from "@/sanity/cache";
 import { buildMetadata } from "@/lib/metadata";
 
@@ -31,20 +36,33 @@ export async function generateMetadata() {
   });
 }
 export default async function Home() {
-  const [portfolioData, statsData] = await Promise.all([
+  const [portfolioData, statsData, servicesData, processData, trustedByData, contactData, footerData] = await Promise.all([
     getCachedPortfolioSection(defaultLanguage),
     getCachedStatsSection(defaultLanguage),
+    getCachedServicesSection(defaultLanguage),
+    getCachedHomepageProcess(defaultLanguage),
+    getCachedTrustedBy(defaultLanguage),
+    getCachedContactSection(defaultLanguage),
+    getCachedFooterData(defaultLanguage),
   ]);
   return (
     <main id="main-content" className="relative min-h-screen">
       <HeroAlt />
       <Stats lang={defaultLanguage} initialData={statsData} />
-      <Services lang={defaultLanguage} />
+      <Services lang={defaultLanguage} initialData={servicesData} />
       <Portfolio lang={defaultLanguage} initialData={portfolioData} />
-      <Process lang={defaultLanguage} />
-      <TrustedBy lang={defaultLanguage} />
-      <Contact lang={defaultLanguage} />
-      <Footer />
+      <Process lang={defaultLanguage} initialData={processData} />
+      <TrustedBy lang={defaultLanguage} initialData={trustedByData} />
+      <Contact
+        lang={defaultLanguage}
+        initialData={contactData}
+        contactItems={footerData?.contactItems ?? undefined}
+      />
+      <Footer
+        lang={defaultLanguage}
+        initialFooterData={footerData}
+        initialServicesData={servicesData}
+      />
     </main>
   );
 }
