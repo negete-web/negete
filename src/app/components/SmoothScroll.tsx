@@ -17,30 +17,48 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
   const pathname = usePathname();
   const lenisRef = useRef<Lenis | null>(null);
 
-  // Inicjalizacja Lenis
+  // Inicjalizacja Lenis – odroczona żeby nie blokować LCP
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const lenis = new Lenis({
-      lerp: 0.1,
-      smoothWheel: true,
-      touchMultiplier: 1.5,
-    });
-
-    lenisRef.current = lenis;
-
     let frameId: number;
-    const raf = (time: number) => {
-      lenis.raf(time);
+    let lenis: Lenis;
+
+    const init = () => {
+      lenis = new Lenis({
+        lerp: 0.1,
+        smoothWheel: true,
+        touchMultiplier: 1.5,
+      });
+
+      lenisRef.current = lenis;
+
+      const raf = (time: number) => {
+        lenis.raf(time);
+        frameId = requestAnimationFrame(raf);
+      };
+
       frameId = requestAnimationFrame(raf);
     };
 
-    frameId = requestAnimationFrame(raf);
+    let idleId: number;
+    if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(init, { timeout: 2000 });
+    } else {
+      idleId = window.setTimeout(init, 100) as unknown as number;
+    }
 
     return () => {
-      cancelAnimationFrame(frameId);
-      lenis.destroy();
-      lenisRef.current = null;
+      if (typeof window.requestIdleCallback === "function") {
+        window.cancelIdleCallback(idleId);
+      } else {
+        clearTimeout(idleId);
+      }
+      if (frameId) cancelAnimationFrame(frameId);
+      if (lenis) {
+        lenis.destroy();
+        lenisRef.current = null;
+      }
     };
   }, []);
 
