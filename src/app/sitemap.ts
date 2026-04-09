@@ -35,9 +35,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
   }
-  const blogSlugs = await sanityClient.fetch<{ slug: string }[]>(
-    `*[_type == "blogPost" && (!defined(publishedAt) || publishedAt <= now())]{ "slug": slug.current }`,
-  );
+  let blogSlugs: { slug: string }[] = [];
+  try {
+    blogSlugs = await sanityClient.fetch<{ slug: string }[]>(
+      `*[_type == "blogPost" && (!defined(publishedAt) || publishedAt <= now())]{ "slug": slug.current }`,
+    );
+  } catch {
+    blogSlugs = [];
+  }
   for (const lang of languages) {
     for (const post of blogSlugs ?? []) {
       if (post.slug) {
@@ -50,11 +55,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
   }
-  const servicesDoc = await sanityClient.fetch<{
-    services?: { slug?: { current?: string } }[];
-  } | null>(
-    `*[_type == "servicesSection"][0]{ services[] { slug { current } } }`,
-  );
+  let servicesDoc: { services?: { slug?: { current?: string } }[] } | null = null;
+  try {
+    servicesDoc = await sanityClient.fetch<{
+      services?: { slug?: { current?: string } }[];
+    } | null>(`*[_type == "servicesSection"][0]{ services[] { slug { current } } }`);
+  } catch {
+    servicesDoc = null;
+  }
   const serviceSlugs = servicesDoc?.services ?? [];
   for (const lang of languages) {
     for (const s of serviceSlugs) {
@@ -70,9 +78,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  const projectSlugs = await sanityClient.fetch<{ slug: string }[]>(
-    `*[_type == "project"]{ "slug": slug.current }`,
-  );
+  let projectSlugs: { slug: string }[] = [];
+  try {
+    projectSlugs = await sanityClient.fetch<{ slug: string }[]>(
+      `*[_type == "project" && !(_id in path("drafts.**"))]{ "slug": slug.current }`,
+    );
+  } catch {
+    projectSlugs = [];
+  }
   for (const lang of languages) {
     for (const project of projectSlugs ?? []) {
       if (project.slug) {
