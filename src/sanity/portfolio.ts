@@ -127,7 +127,9 @@ export async function fetchPortfolioSection(
   const altKey = lang === "pl" ? "altPl" : "altEn";
 
   const projects: Project[] =
-    data.projects?.map((project) => {
+    (data.projects ?? [])
+      .filter((project): project is ProjectRaw => Boolean(project))
+      .map((project) => {
       const categoryLabel = getCategoryLabel(project.category, lang);
       return {
         _id: project._id,
@@ -142,7 +144,7 @@ export async function fetchPortfolioSection(
         category: project.category?.slug?.current,
         categoryLabel,
       };
-    }) || [];
+    });
 
   return {
     _id: data._id,
