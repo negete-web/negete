@@ -83,14 +83,8 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
         defaults: { ease: "power3.inOut", force3D: true },
       });
 
-      tl.to(svgRef.current, {
-        autoAlpha: 1,
-        y: -60,
-        scale: 1.15,
-        duration: 2.5,
-      })
-        .to(paths, { strokeDashoffset: 0, duration: 3, stagger: 0 }, "-=2")
-        .to(
+      // Core letters fly in immediately (t=0) – fastest possible LCP
+      tl.to(
           coreLetters,
           {
             autoAlpha: 1,
@@ -98,12 +92,21 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
             y: 0,
             scale: 1,
             rotation: 0,
-            duration: 1.6,
-            stagger: { each: 0.1, from: "center" },
+            duration: 1.4,
+            stagger: { each: 0.08, from: "center" },
             ease: "back.out(1.4)",
           },
-          "-=2.2",
+          0,
         )
+        // SVG and paths animate in parallel
+        .to(svgRef.current, {
+          autoAlpha: 1,
+          y: -60,
+          scale: 1.15,
+          duration: 2.5,
+        }, 0)
+        .to(paths, { strokeDashoffset: 0, duration: 3, stagger: 0 }, 0.5)
+        // Glow follows after core letters start appearing
         .to(
           glowLetters,
           {
@@ -112,7 +115,7 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
             stagger: { each: 0.1, from: "center" },
             ease: "power2.inOut",
           },
-          "<+=0.3",
+          0.6,
         );
 
       const glowLayer = containerRef.current?.querySelector(".neon-glow-layer");
@@ -129,7 +132,7 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
         tl.to(
           subtitleRef.current,
           { autoAlpha: 1, y: 0, duration: 1.2, ease: "power2.out" },
-          "-=2",
+          1.0,
         );
       }
     }, containerRef);
@@ -178,7 +181,7 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
               <span
                 key={`core-${i}`}
                 ref={(el) => { coreLettersRef.current[i] = el; }}
-                className="inline-block mx-1 will-change-transform">
+                className="inline-block mx-1 invisible opacity-0 will-change-transform">
                 {letter}
               </span>
             ))}
