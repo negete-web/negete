@@ -8,6 +8,15 @@ import { t } from "@/i18n/dictionary";
 
 const HERO_TEXT = "NEGETE";
 
+const START_POSITIONS = [
+  { x: -450, y: 50, rotation: -25 },
+  { x: -300, y: -30, rotation: -15 },
+  { x: -150, y: 20, rotation: -5 },
+  { x: 150, y: -20, rotation: 5 },
+  { x: 300, y: 30, rotation: 15 },
+  { x: 450, y: -50, rotation: 25 },
+];
+
 const BASE_TEXT_CLASS =
   "absolute left-0 top-0 w-full h-full flex justify-between -mt-12 md:mt-0 px-4 md:px-0 items-center font-light text-5xl sm:text-8xl md:text-9xl lg:text-[8rem] xl:text-[9rem] pointer-events-none select-none antialiased";
 
@@ -41,6 +50,7 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
   const subtitleRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const coreLettersRef = useRef<(HTMLSpanElement | null)[]>([]);
   const glowLettersRef = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
@@ -52,7 +62,17 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
         gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
       });
 
+      const coreLetters = coreLettersRef.current.filter(Boolean);
       const glowLetters = glowLettersRef.current.filter(Boolean);
+
+      coreLetters.forEach((letter, i) => {
+        gsap.set(letter, {
+          autoAlpha: 0,
+          ...START_POSITIONS[i],
+          scale: 0.5,
+          transformOrigin: "center center",
+        });
+      });
 
       gsap.set(glowLetters, {
         autoAlpha: 0,
@@ -71,6 +91,20 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
       })
         .to(paths, { strokeDashoffset: 0, duration: 3, stagger: 0 }, "-=2")
         .to(
+          coreLetters,
+          {
+            autoAlpha: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+            duration: 1.6,
+            stagger: { each: 0.1, from: "center" },
+            ease: "back.out(1.4)",
+          },
+          "-=2.2",
+        )
+        .to(
           glowLetters,
           {
             autoAlpha: 1,
@@ -78,7 +112,7 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
             stagger: { each: 0.1, from: "center" },
             ease: "power2.inOut",
           },
-          1.6,
+          "<+=0.3",
         );
 
       const glowLayer = containerRef.current?.querySelector(".neon-glow-layer");
@@ -95,7 +129,7 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
         tl.to(
           subtitleRef.current,
           { autoAlpha: 1, y: 0, duration: 1.2, ease: "power2.out" },
-          2.2,
+          "-=2",
         );
       }
     }, containerRef);
@@ -143,7 +177,8 @@ export default function HeroAlt({ lang = "pl" }: HeroAltProps) {
             {HERO_TEXT.split("").map((letter, i) => (
               <span
                 key={`core-${i}`}
-                className="inline-block mx-1">
+                ref={(el) => { coreLettersRef.current[i] = el; }}
+                className="inline-block mx-1 will-change-transform">
                 {letter}
               </span>
             ))}
