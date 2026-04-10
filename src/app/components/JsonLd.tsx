@@ -34,6 +34,7 @@ export function WebSiteJsonLd({ lang }: { lang: string }) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "NeGeTe",
+    alternateName: "negete.pl",
     url: langBase,
     inLanguage: lang === "pl" ? "pl-PL" : "en-US",
     publisher: {

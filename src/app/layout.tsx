@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { defaultLanguage, languages, type Language } from "@/i18n/config";
+import { getBaseUrl } from "@/lib/site-url";
 import AppShell from "./components/AppShell";
 import AuroraBackground from "./components/AuroraBackground";
 import { OrganizationJsonLd, WebSiteJsonLd } from "./components/JsonLd";
@@ -27,10 +28,24 @@ const orbitron = Orbitron({
   display: "swap",
 });
 
+const baseUrl = getBaseUrl();
+
 export const metadata: Metadata = {
   title: "NeGeTe | Twój zewnętrzny dział R&D",
+  applicationName: "NeGeTe",
   description:
     "NeGeTe - projektowanie elektroniki, mechaniki i oprogramowania. Od pomysłu do produktu.",
+  alternates: {
+    canonical: baseUrl,
+  },
+  openGraph: {
+    siteName: "NeGeTe",
+    title: "NeGeTe | Twój zewnętrzny dział R&D",
+    description:
+      "NeGeTe - projektowanie elektroniki, mechaniki i oprogramowania. Od pomysłu do produktu.",
+    url: baseUrl,
+    type: "website",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
