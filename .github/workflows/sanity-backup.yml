@@ -56,7 +56,7 @@ jobs:
           sanity dataset export \
             ${{ steps.meta.outputs.dataset }} \
             "backups/${{ steps.meta.outputs.dataset }}-${{ steps.meta.outputs.datetime }}.tar.gz" \
-            --project 3rcj5swa \
+            --project-id 3rcj5swa \
             $ASSETS_FLAG
 
       - name: Show backup size
