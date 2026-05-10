@@ -26,17 +26,13 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout
+      - name: Checkout (potrzebne do sanity.cli/config)
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Set backup metadata
         id: meta
@@ -44,6 +40,9 @@ jobs:
           echo "date=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
           echo "datetime=$(date -u +%Y-%m-%dT%H-%M-%SZ)" >> $GITHUB_OUTPUT
           echo "dataset=${{ github.event.inputs.dataset || 'production' }}" >> $GITHUB_OUTPUT
+
+      - name: Install Sanity CLI (bez deps projektu)
+        run: npm install -g @sanity/cli
 
       - name: Export Sanity dataset
         env:
@@ -54,9 +53,10 @@ jobs:
           if [ "${{ github.event.inputs.include_assets }}" = "false" ]; then
             ASSETS_FLAG="--no-assets"
           fi
-          npx sanity dataset export \
+          sanity dataset export \
             ${{ steps.meta.outputs.dataset }} \
             "backups/${{ steps.meta.outputs.dataset }}-${{ steps.meta.outputs.datetime }}.tar.gz" \
+            --project 3rcj5swa \
             $ASSETS_FLAG
 
       - name: Show backup size
