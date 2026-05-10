@@ -65,6 +65,12 @@ const dictionaries: Record<Language, Record<string, string>> = {
     "uslugiDetail.ctaDescription":
       "Skontaktuj się z nami, aby omówić jak możemy pomóc w realizacji Twojego projektu.",
     "uslugiDetail.ctaButton": "Skontaktuj się",
+    "notFound.code": "404",
+    "notFound.heading": "Nie znaleziono strony",
+    "notFound.description":
+      "Wygląda na to, że ta strona nie istnieje albo została przeniesiona. Sprawdź adres lub wróć na stronę główną.",
+    "notFound.goBack": "Wróć",
+    "notFound.goHome": "Strona główna",
   },
   en: {
     "nav.home": "About us",
@@ -130,6 +136,12 @@ const dictionaries: Record<Language, Record<string, string>> = {
     "uslugiDetail.ctaDescription":
       "Contact us to discuss how we can help bring your project to life.",
     "uslugiDetail.ctaButton": "Contact us",
+    "notFound.code": "404",
+    "notFound.heading": "Page not found",
+    "notFound.description":
+      "It looks like this page doesn't exist or has been moved. Check the address or return to the home page.",
+    "notFound.goBack": "Go back",
+    "notFound.goHome": "Home",
   },
 };
 

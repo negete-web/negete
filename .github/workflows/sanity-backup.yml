@@ -1,0 +1,72 @@
+name: Sanity dataset backup
+
+on:
+  schedule:
+    # Co niedzielę o 03:00 UTC (05:00 CET / 04:00 CEST)
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: "Dataset do backupu"
+        required: true
+        default: "production"
+        type: string
+      include_assets:
+        description: "Dołączyć assety (obrazy/pliki)?"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set backup metadata
+        id: meta
+        run: |
+          echo "date=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
+          echo "datetime=$(date -u +%Y-%m-%dT%H-%M-%SZ)" >> $GITHUB_OUTPUT
+          echo "dataset=${{ github.event.inputs.dataset || 'production' }}" >> $GITHUB_OUTPUT
+
+      - name: Export Sanity dataset
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}
+        run: |
+          mkdir -p backups
+          ASSETS_FLAG=""
+          if [ "${{ github.event.inputs.include_assets }}" = "false" ]; then
+            ASSETS_FLAG="--no-assets"
+          fi
+          npx sanity dataset export \
+            ${{ steps.meta.outputs.dataset }} \
+            "backups/${{ steps.meta.outputs.dataset }}-${{ steps.meta.outputs.datetime }}.tar.gz" \
+            $ASSETS_FLAG
+
+      - name: Show backup size
+        run: ls -lh backups/
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanity-backup-${{ steps.meta.outputs.dataset }}-${{ steps.meta.outputs.date }}
+          path: backups/*.tar.gz
+          retention-days: 90
+          if-no-files-found: error
+          compression-level: 0
