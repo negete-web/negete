@@ -109,7 +109,7 @@ export async function fetchPortfolioSection(
         descriptionPl,
         descriptionEn,
         category->{ titlePl, titleEn, slug }
-      }[defined(_id) && !(_id in path("drafts.**"))]
+      }
     }
   `;
 
