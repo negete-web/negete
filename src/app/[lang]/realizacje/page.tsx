@@ -52,7 +52,7 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
 
   return (
     <>
-      <main id="main-content" className="min-h-screen overflow-hidden">
+      <main id="main-content" className="overflow-hidden">
         {/* Tło — rozmyte plamy neonowe */}
         <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[120px]" />
@@ -60,7 +60,7 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
           <div className="absolute bottom-1/4 left-1/4 w-[350px] h-[350px] rounded-full bg-violet-500/6 blur-[100px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-26 md:py-36">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-26 md:pt-36 pb-16 md:pb-24">
           <div className="mb-12 lg:mb-16">
             <h1 className="text-3xl sm:text-4xl font-medium mb-6 leading-tight bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent">
               {t(lang as Language, "realizacje.title")}
@@ -149,7 +149,7 @@ export default async function ProjectsPage({ params, searchParams }: Props) {
               </div>
             </section>
           ) : (
-            <div className="text-center py-20 lg:py-32">
+            <div className="text-center py-16 lg:py-24">
               <p className="text-gray-400 text-xl lg:text-2xl">
                 {t(lang as Language, "realizacje.noProjectsInCategory")}
               </p>

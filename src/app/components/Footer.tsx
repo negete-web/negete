@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Mail,
   Phone,
@@ -12,7 +12,6 @@ import {
   Instagram,
   Youtube,
 } from "lucide-react";
-import gsap from "gsap";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocalizedPath } from "@/hooks/useLocalizedPath";
@@ -45,8 +44,6 @@ export default function Footer({
   initialFooterData = null,
   initialServicesData = null,
 }: FooterProps) {
-  const footerRef = useRef<HTMLElement>(null);
-  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
   const { lang, getPath } = useLocalizedPath(langProp);
   const [footerData, setFooterData] =
     useState<Awaited<ReturnType<typeof fetchFooterData>>>(initialFooterData);
@@ -70,49 +67,6 @@ export default function Footer({
       )
       .catch(() => setFaqItems([]));
   }, [lang, initialFooterData, initialServicesData]);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      if (footerRef.current) {
-        gsap.fromTo(
-          footerRef.current,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            force3D: true,
-            scrollTrigger: {
-              trigger: footerRef.current,
-              start: "top 90%",
-            },
-          },
-        );
-      }
-
-      sectionsRef.current.forEach((section, index) => {
-        if (section) {
-          gsap.fromTo(
-            section,
-            { opacity: 0, y: 30 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              delay: index * 0.1,
-              force3D: true,
-              scrollTrigger: {
-                trigger: footerRef.current,
-                start: "top 90%",
-              },
-            },
-          );
-        }
-      });
-    }, footerRef);
-
-    return () => ctx.revert();
-  }, []);
 
   const companyLinks = [
     { name: t(lang, "nav.home"), href: getPath("/"), key: "home" },
@@ -180,7 +134,6 @@ export default function Footer({
 
   return (
     <footer
-      ref={footerRef}
       className="relative border-t border-white/10 bg-gradient-to-b from-transparent to-black/20 backdrop-blur-sm">
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 h-1 w-32 sm:w-48 rounded-full"
@@ -196,9 +149,6 @@ export default function Footer({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Kolumna 1: logo + opis + kontakt + social */}
           <div
-            ref={(el) => {
-              sectionsRef.current[0] = el;
-            }}
             className="space-y-4">
             <Link href={getPath("/")} className="inline-block">
               <Image
@@ -253,9 +203,6 @@ export default function Footer({
 
           {/* Kolumna 2: nawigacja firmowa */}
           <div
-            ref={(el) => {
-              sectionsRef.current[1] = el;
-            }}
             className="space-y-4">
             <h3 className="text-white font-bold text-lg mb-4">
               {t(lang, "footer.company")}
@@ -276,9 +223,6 @@ export default function Footer({
           {/* Kolumna 3: usługi (tylko jeśli są dane z Sanity) */}
           {serviceLinks.length > 0 && (
             <div
-              ref={(el) => {
-                sectionsRef.current[2] = el;
-              }}
               className="space-y-4">
               <h3 className="text-white font-bold text-lg mb-4">
                 {t(lang, "footer.services")}
@@ -300,9 +244,6 @@ export default function Footer({
           {/* Kolumna 4: FAQ (tylko jeśli są pytania) */}
           {faqItems.length > 0 && (
             <div
-              ref={(el) => {
-                sectionsRef.current[3] = el;
-              }}
               className="space-y-4">
               <h3 className="text-white font-bold text-lg mb-4">
                 {t(lang, "footer.faqDefault")}
